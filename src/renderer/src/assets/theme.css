@@ -1,0 +1,13 @@
+:root {
+  --color-background-primary: #181818; 
+  --color-background-secondary: #202020; 
+  --color-background-tertiary: #303030; 
+  
+  --color-text-primary: #e0e0e0; 
+  --color-text-secondary: #aaaaaa; 
+  --color-text-placeholder: #505050; 
+
+  --color-accent: #78a1e6;
+  --color-border: #303030; 
+  --color-shadow: rgba(0, 0, 0, 0.4); 
+}

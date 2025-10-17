@@ -28,8 +28,5 @@ git clone https://github.com/LeDuyNg/Memoura.git
 
 # make sure you are in the main folder and install dependencies
 npm install       
-
-
-# if using electron
-# start the Tauri Application/Web Application
+# start the application with 
 npm run dev

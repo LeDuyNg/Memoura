@@ -17,6 +17,13 @@
   box-shadow: 2px 0 5px var(--color-shadow); 
   display: flex;
   flex-direction: column;
+  transition: width 0.3s ease;
+}
+
+.sidebar.hidden {
+  width: 0;
+  padding: 0;
+  box-shadow: none;
 }
 
 
@@ -29,7 +36,23 @@
 
 
 .sidebar-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
   margin-bottom: 20px;
+}
+
+.toggle-sidebar-button {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+}
+
+.toggle-sidebar-button img {
+  width: 24px;
+  height: 24px;
+  filter: invert(1);
 }
 
 .sidebar-title {
@@ -117,4 +140,18 @@ html, body, #root {
   padding: 0;
   height: 100%; 
   overflow: hidden; 
+}
+
+.left-button.button-hidden {
+  position: fixed;
+  top: 20px;
+  left: 20px;
+  z-index: 1000;
+}
+
+.right-button.button-hidden {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  z-index: 1000;
 }

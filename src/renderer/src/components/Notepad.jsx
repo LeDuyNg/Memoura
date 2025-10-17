@@ -1,8 +1,8 @@
 function Notepad() {
   return (
-    <div className="notepad">
+    <main>
       <textarea placeholder="Start typing here..."></textarea>
-    </div>
+    </main>
   );
 }
 

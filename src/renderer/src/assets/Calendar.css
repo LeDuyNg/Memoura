@@ -1,0 +1,117 @@
+/* --- Main Container --- */
+.calendar-container {
+    flex:1;
+    width: 900px;
+    background-color: #1c1c1e; /* Dark background */
+  color: #f2f2f7; /* Light text */
+  border-radius: 12px;
+  padding: 20px;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  margin: 40px auto; /* Center the calendar on the page */
+}
+
+/* --- Header --- */
+.calendar-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.calendar-header h1 {
+  font-size: 24px;
+  font-weight: 600;
+  margin: 0;
+}
+
+.calendar-nav button {
+  background-color: #3a3a3c;
+  border: none;
+  color: #f2f2f7;
+  padding: 6px 12px;
+  border-radius: 6px;
+  cursor: pointer;
+  margin-left: 5px;
+  font-size: 14px;
+}
+
+.calendar-nav button:hover {
+  background-color: #58585a;
+}
+
+/* --- Grid Layout --- */
+.day-names, .calendar-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr); /* 7 equal columns */
+}
+
+.day-names {
+  margin-bottom: 10px;
+}
+
+.day-name {
+  text-align: center;
+  font-weight: 500;
+  color: #8e8e93; /* Muted color for day names */
+  font-size: 14px;
+}
+
+/* --- Individual Day Cells --- */
+.calendar-day {
+  border-top: 1px solid #3a3a3c;
+  padding: 8px;
+  min-height: 110px;
+  position: relative;
+}
+
+/* Add left border to all but the first cell in a row */
+.calendar-day:not(:nth-child(7n+1)) {
+    border-left: 1px solid #3a3a3c;
+}
+
+.day-number {
+  font-size: 14px;
+  font-weight: 500;
+  display: inline-block;
+}
+
+/* Style for days not in the current month */
+.other-month .day-number {
+  color: #555;
+}
+
+/* Red circle for the current day */
+.today {
+  background-color: #ff3b30; /* iOS-like red */
+  color: white;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-left: -4px; /* Adjust position */
+}
+
+
+/* --- Events --- */
+.events {
+  margin-top: 4px;
+}
+
+.event-pill {
+  font-size: 12px;
+  padding: 3px 6px;
+  border-radius: 4px;
+  margin-bottom: 4px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  color: white;
+}
+
+/* Event color classes */
+.event-pill.purple { background-color: #af52de; }
+.event-pill.orange { background-color: #ff9500; }
+.event-pill.blue { background-color: #007aff; }
+.event-pill.more { background-color: transparent; color: #8e8e93;}

@@ -12,7 +12,7 @@ import AiIcon from "../assets/ai.svg";
 
 import ArrowIcon from "../assets/arrow_down.svg";
 
-function Sidebar() {
+function Sidebar({setActiveView}) {
   const [isClosed, setIsClosed] = useState(false);
   const [openSubMenu, setOpenSubMenu] = useState(null); 
 
@@ -26,6 +26,11 @@ function Sidebar() {
       setIsClosed(false); 
     }
     setOpenSubMenu(openSubMenu === menuName ? null : menuName);
+  };
+
+  const handleNavClick = (e, viewName) => {
+    e.preventDefault();
+    setActiveView(viewName);
   };
 
   return (
@@ -115,7 +120,7 @@ function Sidebar() {
         </li>
 
         <li>
-          <a href="#">
+          <a href="#" id="Calendar Button" onClick={(e) => handleNavClick(e, 'calendar')}>
             <img src={CalendarIcon} alt="Calendar" />
             <span>Calendar</span>
           </a>

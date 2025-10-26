@@ -55,7 +55,7 @@ function Sidebar({setActiveView}) {
         </li>
 
         <li>
-          <a href="#">
+          <a href="#" onClick={(e) => handleNavClick(e, 'dashboard')}>
             <img src={DashboardIcon} alt="Dashboard" />
             <span>Dashboard</span>
           </a>

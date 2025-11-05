@@ -4,8 +4,8 @@ import Sidebar from "./components/Sidebar";
 import Calendar from './components/Calendar';
 import Dashboard from './components/Dashboard';
 function App() {
-  // State to manage which component is active. Default to 'notepad'
-  const [activeView, setActiveView] = useState('notepad');
+  // State to manage which component is active. Default to 'dashboard'
+  const [activeView, setActiveView] = useState('dashboard');
   return (
     <div className="app">
       <Sidebar setActiveView={setActiveView}/>

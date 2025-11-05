@@ -2,7 +2,6 @@ import { useState } from "react";
 
 // Import the icons you copied into src/assets
 import ToggleIcon from "../assets/arrow_left_double.svg";
-import HomeIcon from "../assets/home.svg";
 import DashboardIcon from "../assets/dashboard.svg";
 
 import CreateIcon from "../assets/create_folder.svg";
@@ -45,13 +44,6 @@ function Sidebar({setActiveView}) {
           >
             <img src={ToggleIcon} alt="Toggle Sidebar" />
           </button>
-        </li>
-
-        <li>
-          <a href="#">
-            <img src={HomeIcon} alt="Home" />
-            <span>Home</span>
-          </a>
         </li>
 
         <li>

@@ -1,5 +1,6 @@
 import { app, shell, BrowserWindow, ipcMain } from "electron";
 import { join } from "path";
+import path from 'path';
 import { electronApp, optimizer, is } from "@electron-toolkit/utils";
 import icon from "../../resources/icon.png?asset";
 
@@ -60,6 +61,19 @@ app.whenReady().then(() => {
     if (BrowserWindow.getAllWindows().length === 0) createWindow();
   });
 });
+
+// This handler will find the 'Notes' folder relative to the project root
+ipcMain.handle('get-vault-path', () => {
+  // app.getAppPath() returns the path to your project's root in development
+  // (e.g., /Users/duynguyen/SJSU/CMPE-133/Memoura)
+  // On your teammate's machine, it will be their path.
+  const rootPath = app.getAppPath()
+  
+  // We then join that with 'Notes'
+  const vaultPath = path.join(rootPath, 'Notes')
+  
+  return vaultPath
+})
 
 // Quit when all windows are closed, except on macOS. There, it's common
 // for applications and their menu bar to stay active until the user quits

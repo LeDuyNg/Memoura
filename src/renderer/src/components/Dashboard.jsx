@@ -1,128 +1,82 @@
 import React, { useState } from 'react';
 import '../assets/Dashboard.css';
 
-function Dashboard() {
-  const [viewMode, setViewMode] = useState('list'); 
+// Group the folder and its files
+import { Fragment } from 'react'; 
 
-  // THGIS IS JUST SAMPLE STUFF REMOVE IT LATER LOLOOLOL
-  const suggestedFolders = [
-    {
-      id: 1,
-      name: "test folder 1",
-      location: "",
-      type: "folder"
-    },
-    {
-      id: 2,
-      name: "test folder 2",
-      location: "",
-      type: "folder"
-    }
-  ];
-
-  const suggestedFiles = [
-    {
-      id: 1,
-      name: "test file 1",
-      reason: "random name edited • 6:31 PM",
-      owner: "random name",
-      location: "",
-      type: "txt"
-    },
-    {
-      id: 2,
-      name: "test file 2",
-      reason: "You've opened frequently",
-      owner: "me",
-      location: "",
-      type: "pdf"
-    },
-    {
-      id: 3,
-      name: "test file 3",
-      reason: "You edited • Oct 11, 2025",
-      owner: "me",
-      location: "",
-      type: "doc"
-    },
-    {
-      id: 4,
-      name: "test file 4",
-      reason: "random name edited • Oct 22, 2025",
-      owner: "random name",
-      location: "",
-      type: "txt"
-    },
-    {
-      id: 5,
-      name: "test file 5",
-      reason: "You opened • Oct 11, 2025",
-      owner: "me",
-      location: "",
-      type: "pdf"
-    },
-    {
-      id: 6,
-      name: "test file 6",
-      reason: "You opened • Oct 11, 2025",
-      owner: "me",
-      location: "",
-      type: "doc"
-    },
-    {
-      id: 7,
-      name: "test file 7",
-      reason: "You opened • Oct 11, 2025",
-      owner: "random name",
-      location: "",
-      type: "txt"
-    },
-    {
-      id: 8,
-      name: "test file 8",
-      reason: "random name edited • Oct 3, 2025",
-      owner: "random name",
-      location: "",
-      type: "pdf"
-    },
-    {
-      id: 9,
-      name: "test file 9",
-      reason: "random name edited • Oct 3, 2025",
-      owner: "random name",
-      location: "",
-      type: "doc"
-    },
-    {
-      id: 10,
-      name: "test file 10",
-      reason: "You opened • Oct 21, 2025",
-      owner: "random name",
-      location: "",
-      type: "txt"
-    }
-  ];
+function Dashboard({ vaultData, isLoading, error }) {
+  const [viewMode, setViewMode] = useState('list');
+  
+  // Add state to track the *filepath* of the expanded folder
+  const [expandedFolder, setExpandedFolder] = useState(null);
 
   const getFileIcon = (type) => {
-    switch (type) {
-      case 'txt':
+    const ext = type.startsWith('.') ? type.substring(1).toUpperCase() : type.toUpperCase();
+    switch (ext) {
+      case 'MD':
+        return 'MD';
+      case 'TXT':
         return 'TXT';
-      case 'pdf':
+      case 'PDF':
         return 'PDF';
-      case 'doc':
+      case 'DOC':
+      case 'DOCX':
         return 'DOC';
-      case 'folder':
+      case 'FOLDER':
         return 'FOLDER';
       default:
-        return 'TXT';
+        return ext; 
     }
   };
 
-  const getOwnerIcon = (owner) => {
-    if (owner === 'me') return 'ME';
-    if (owner === 'random name') return 'USER';
-    return 'USER';
+  // Click handler to set or clear the expanded folder
+  const handleFolderClick = (folderFilepath) => {
+    // If we click the folder that's already open, close it (set to null)
+    if (expandedFolder === folderFilepath) {
+      setExpandedFolder(null);
+    } else {
+      // Otherwise, open the clicked folder
+      setExpandedFolder(folderFilepath);
+    }
   };
+
+  // Helper function to get files for a specific folder path
+  const getFilesForFolder = (folderFilepath) => {
+    return vaultData.files.filter(file => {
+      // Get the parent directory of the file
+      const lastSlashIndex = file.filepath.lastIndexOf('/');
+      
+      // If no '/', the parent is the root ("")
+      const parentDir = lastSlashIndex === -1 ? "" : file.filepath.substring(0, lastSlashIndex);
+      
+      // Check if the file's parent directory matches the folder's path
+      return parentDir === folderFilepath;
+    });
+  };
+
+  // Create a new list of folders
+  const allFoldersWithRoot = [
+    ...vaultData.folders // All the subfolders from the scanner
+  ];
+
+  // (Loading and Error handling - keep this)
+  if (isLoading) {
+    return (
+      <div className="dashboard">
+        <div className="dashboard-header"><h1>Welcome to Memoura</h1></div>
+        <div className="dashboard-content"><p>Scanning vault...</p></div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="dashboard">
+        <div className="dashboard-header"><h1>Welcome to Memoura</h1></div>
+        <div className="dashboard-content"><p className="error-message">Error: {error}</p></div>
+      </div>
+    );
+  }
 
   return (
     <div className="dashboard">
@@ -131,27 +85,51 @@ function Dashboard() {
       </div>
 
       <div className="dashboard-content">
-        {/* All Folders */}
+
         <div className="suggested-section">
-          <h2>All folders</h2>
-          <div className="folders-grid">
-            {suggestedFolders.map(folder => (
-              <div key={folder.id} className="folder-item">
-                <div className="folder-icon">
-                  {getFileIcon(folder.type)}
+          <h2>All folders ({allFoldersWithRoot.length})</h2>
+          
+          <div className="folders-list"> 
+            
+            {allFoldersWithRoot.map(folder => (
+              <Fragment key={folder.filepath}>
+                
+                <div 
+                  className="folder-item" 
+                  onClick={() => handleFolderClick(folder.filepath)}
+                  style={{ cursor: 'pointer' }} // Show it's clickable
+                >
+                  <div className="folder-icon">
+                    {/* Show an icon if it's open or closed */}
+                    {expandedFolder === folder.filepath ? '▼' : '►'}
+                    {' '}
+                    {getFileIcon('folder')}
+                  </div>
+                  <div className="folder-info">
+                    <div className="folder-name">{folder.name}</div>
+                    <div className="folder-location">{folder.filepath || './'}</div>
+                  </div>
                 </div>
-                <div className="folder-info">
-                  <div className="folder-name">{folder.name}</div>
-                  <div className="folder-location">{folder.location}</div>
-                </div>
-              </div>
+
+                {expandedFolder === folder.filepath && (
+                  <div className="expanded-files-container">
+                    
+                    {/* Get and render the files for *this* folder */}
+                    {getFilesForFolder(folder.filepath).map(file => (
+                      <div key={file.filepath} className="file-item-indent">
+                        <span className="file-icon">{getFileIcon(file.filetype)}</span>
+                        <span>{file.name}</span>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </Fragment>
             ))}
           </div>
         </div>
-
         <div className="suggested-section">
           <div className="files-header">
-            <h2>All files</h2>
+            <h2>All files ({vaultData.files.length})</h2>
             <div className="view-controls">
               <button 
                 className={`view-btn ${viewMode === 'list' ? 'active' : ''}`}
@@ -176,13 +154,13 @@ function Dashboard() {
             </div>
             
             <div className="table-body">
-              {suggestedFiles.map(file => (
-                <div key={file.id} className="file-row">
+              {vaultData.files.map(file => (
+                <div key={file.filepath} className="file-row">
                   <div className="col-name">
                     <span className="file-name">{file.name}</span>
                   </div>
                   <div className="col-type">
-                    <span className="file-type">{getFileIcon(file.type)}</span>
+                    <span className="file-type">{getFileIcon(file.filetype)}</span>
                   </div>
                   <div className="col-actions">
                   </div>

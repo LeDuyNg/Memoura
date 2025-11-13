@@ -1,15 +1,19 @@
-import { contextBridge } from "electron";
+import { contextBridge, ipcRenderer } from 'electron';
 import { electronAPI } from "@electron-toolkit/preload";
 
-// Custom APIs for renderer
-const api = {};
+import { scanVault } from "./fileScanner.js";
 
-// Use `contextBridge` APIs to expose Electron APIs to
-// renderer only if context isolation is enabled, otherwise
-// just add to the DOM global.
+// Custom APIs for renderer
+const api = {
+  scanVault: (vaultPath) => scanVault(vaultPath),
+  getVaultPath: () => ipcRenderer.invoke('get-vault-path')
+};
+
+
 if (process.contextIsolated) {
   try {
     contextBridge.exposeInMainWorld("electron", electronAPI);
+    
     contextBridge.exposeInMainWorld("api", api);
   } catch (error) {
     console.error(error);

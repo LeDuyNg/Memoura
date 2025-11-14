@@ -9,54 +9,87 @@ import Dashboard from './components/Dashboard';
 function App() {
   const [activeView, setActiveView] = useState('dashboard');
   
-  // Initialize state to hold both files and folders
   const [vaultData, setVaultData] = useState({ files: [], folders: [] });
-  const [isLoading, setIsLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(true); // Start as true
   const [error, setError] = useState(null);
+  const [canvasCourses, setCanvasCourses] = useState([]);
 
   useEffect(() => {
-    const loadFiles = async () => {
+    // Run both tasks in parallel
+    const loadAllData = async () => {
       setIsLoading(true);
       setError(null);
       
-      try {
-        const vaultPath = await window.api.getVaultPath();
+      // This runs both tasks at the same time and waits for both to finish
+      const results = await Promise.allSettled([
+        loadVaultFiles(),  // Task 1
+        loadCanvasData()   // Task 2
+      ]);
 
-        if (window.api && window.api.scanVault) {
-        
-          // The function now returns an object { files, folders }
-          const data = await window.api.scanVault(vaultPath);
-          
-          // Set the entire object in state
-          setVaultData(data);
+      console.log('Data loading results:', results);
 
-        } else {
-          console.error("Error: window.api.scanVault is not available.");
-          setError("File scanning API is not loaded.");
-        }
-
-      } catch (err) {
-        console.error("Error scanning vault:", err);
-        setError(err.message);
-      } finally {
-        setIsLoading(false);
+      // --- Handle Vault File results ---
+      if (results[0].status === 'fulfilled') {
+        setVaultData(results[0].value);
+      } else {
+        // If it failed, log the error
+        console.error('Failed to load vault files:', results[0].reason);
+        setError('Failed to load vault files.');
       }
+
+      // --- Handle Canvas Data results ---
+      if (results[1].status === 'fulfilled') {
+        const coursesData = results[1].value;
+        setCanvasCourses(coursesData);
+      } else {
+        // If it failed, log the error
+        console.error('Failed to load Canvas courses:', results[1].reason);
+        setError('Failed to load Canvas courses.');
+      }
+      
+      setIsLoading(false);
     };
 
-    loadFiles();
+    loadAllData();
   }, []); // Runs once on mount
 
+
+  // --- Helper function for loading vault ---
+  const loadVaultFiles = async () => {
+    if (!window.api?.getVaultPath || !window.api?.scanVault) {
+      throw new Error("File scanning API is not available.");
+    }
+    const vaultPath = await window.api.getVaultPath();
+    const data = await window.api.scanVault(vaultPath);
+    return data;
+  };
+
+  // --- Helper function for loading canvas ---
+  const loadCanvasData = async () => {
+    if (!window.api?.fetchCanvasData) {
+      throw new Error("Canvas API is not available.");
+    }
+    // Pass the base endpoint, the handler in main.js will add the params
+    const courses = await window.api.fetchCanvasData('/api/v1/courses'); 
+    if (courses.error) {
+      // Throw an error to be caught by allSettled
+      throw new Error(courses.error);
+    }
+    return courses;
+  };
   return (
     <div className="app">
       <Sidebar 
         setActiveView={setActiveView} 
-        files={vaultData.files} 
-        folders={vaultData.folders} 
       />
 
       <div className="main-content">
         {activeView === 'notepad' && <Notepad />}
-        {activeView === 'calendar' && <Calendar />}
+        {activeView === 'calendar' && (
+          <Calendar
+            courses={canvasCourses}
+            />
+          )}
         {activeView === 'dashboard' && (
           <Dashboard 
             vaultData={vaultData}

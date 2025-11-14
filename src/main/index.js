@@ -4,6 +4,12 @@ import path from 'path';
 import { electronApp, optimizer, is } from "@electron-toolkit/utils";
 import icon from "../../resources/icon.png?asset";
 
+// Load environment variables from .env file
+import dotenv from 'dotenv'
+// Note: In development, app.getAppPath() points to your project root
+dotenv.config({ path: path.join(app.getAppPath(), '.env') })
+import { registerCanvasHandler } from '../preload/CanvasAPI.js'
+
 function createWindow() {
   // Create the browser window.
   const mainWindow = new BrowserWindow({
@@ -15,6 +21,7 @@ function createWindow() {
     webPreferences: {
       preload: join(__dirname, "../preload/index.js"),
       sandbox: false,
+      contextIsolation: true
     },
   });
 
@@ -55,6 +62,8 @@ app.whenReady().then(() => {
 
   createWindow();
 
+  registerCanvasHandler(ipcMain)
+
   app.on("activate", function () {
     // On macOS it's common to re-create a window in the app when the
     // dock icon is clicked and there are no other windows open.
@@ -64,9 +73,6 @@ app.whenReady().then(() => {
 
 // This handler will find the 'Notes' folder relative to the project root
 ipcMain.handle('get-vault-path', () => {
-  // app.getAppPath() returns the path to your project's root in development
-  // (e.g., /Users/duynguyen/SJSU/CMPE-133/Memoura)
-  // On your teammate's machine, it will be their path.
   const rootPath = app.getAppPath()
   
   // We then join that with 'Notes'
@@ -84,5 +90,3 @@ app.on("window-all-closed", () => {
   }
 });
 
-// In this file you can include the rest of your app's specific main process
-// code. You can also put them in separate files and require them here.

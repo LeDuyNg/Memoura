@@ -6,7 +6,8 @@ import { scanVault } from "./fileScanner.js";
 // Custom APIs for renderer
 const api = {
   scanVault: (vaultPath) => scanVault(vaultPath),
-  getVaultPath: () => ipcRenderer.invoke('get-vault-path')
+  getVaultPath: () => ipcRenderer.invoke('get-vault-path'),
+  fetchCanvasData: (endpoint) => ipcRenderer.invoke('fetch-canvas-data', endpoint)
 };
 
 

@@ -107,7 +107,13 @@
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  color: white;
+  color: white; /* Set text to white for all pills */
+  cursor: pointer; /* Show it's clickable */
+  transition: filter 0.2s;
+}
+
+.event-pill:hover {
+  filter: brightness(1.2); /* Add a slight glow on hover */
 }
 
 /* Event color classes */
@@ -115,3 +121,83 @@
 .event-pill.orange { background-color: #ff9500; }
 .event-pill.blue { background-color: #007aff; }
 .event-pill.more { background-color: transparent; color: #8e8e93;}
+
+/* Added colors */
+.event-pill.green { background-color: #34c759; }
+.event-pill.red { background-color: #ff3b30; }
+.event-pill.teal { background-color: #5ac8fa; }
+.event-pill.pink { background-color: #ff2d55; }
+.event-pill.indigo { background-color: #5856d6; }
+
+
+/* --- MODAL STYLES --- */
+
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.7);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000; /* Ensure it's on top */
+}
+
+.modal-content {
+  background: #2c2c2e; /* Slightly lighter dark shade */
+  padding: 24px;
+  border-radius: 12px;
+  width: 90%;
+  max-width: 500px;
+  color: #f2f2f7;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+}
+
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid #3a3a3c;
+  margin-bottom: 16px;
+  padding-bottom: 16px;
+}
+
+.modal-header h1 {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 600;
+  color: #8e8e93; /* Muted color for course name */
+}
+
+.modal-header button {
+  background: none;
+  border: none;
+  color: #8e8e93;
+  font-size: 24px;
+  font-weight: 600;
+  cursor: pointer;
+  padding: 0;
+  line-height: 1;
+}
+
+.modal-body h2 {
+  margin-top: 0;
+  margin-bottom: 16px;
+  font-size: 22px;
+  font-weight: 600;
+  color: #ffffff;
+}
+
+.modal-body p {
+  font-size: 16px;
+  line-height: 1.5;
+  color: #e5e5ea;
+  margin: 10px 0;
+}
+
+.modal-body p strong {
+  color: #8e8e93; /* Muted color for labels */
+  margin-right: 8px;
+}

@@ -10,8 +10,7 @@ const api = {
   getVaultPath: () => ipcRenderer.invoke('get-vault-path'),
   readFile: (filePath) => ipcRenderer.invoke('read-file', filePath),
   writeFile: (filePath, content) => ipcRenderer.invoke('write-file', filePath, content),
-  joinPath: (...paths) => path.join(...paths)
-  getVaultPath: () => ipcRenderer.invoke('get-vault-path'),
+  joinPath: (...paths) => path.join(...paths),
   fetchCanvasData: (endpoint) => ipcRenderer.invoke('fetch-canvas-data', endpoint)
 };
 

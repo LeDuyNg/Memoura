@@ -44,8 +44,7 @@ function Dashboard({ vaultData, isLoading, error }) {
   const getFilesForFolder = (folderFilepath) => {
     return vaultData.files.filter(file => {
       // Get the parent directory of the file
-      const lastSlashIndex = file.filepath.lastIndexOf('/');
-      
+      const lastSlashIndex = Math.max(file.filepath.lastIndexOf('/'), file.filepath.lastIndexOf('\\'));      
       // If no '/', the parent is the root ("")
       const parentDir = lastSlashIndex === -1 ? "" : file.filepath.substring(0, lastSlashIndex);
       

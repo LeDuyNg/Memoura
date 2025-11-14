@@ -1,6 +1,7 @@
 import { app, shell, BrowserWindow, ipcMain } from "electron";
 import { join } from "path";
 import path from 'path';
+import fs from 'fs';
 import { electronApp, optimizer, is } from "@electron-toolkit/utils";
 import icon from "../../resources/icon.png?asset";
 
@@ -79,6 +80,28 @@ ipcMain.handle('get-vault-path', () => {
   const vaultPath = path.join(rootPath, 'Notes')
   
   return vaultPath
+})
+
+// Handler to read file contents
+ipcMain.handle('read-file', async (_, filePath) => {
+  try {
+    const content = await fs.promises.readFile(filePath, 'utf-8');
+    return { success: true, content };
+  } catch (error) {
+    console.error('Error reading file:', error);
+    return { success: false, error: error.message };
+  }
+})
+
+// Handler to write file contents
+ipcMain.handle('write-file', async (_, filePath, content) => {
+  try {
+    await fs.promises.writeFile(filePath, content, 'utf-8');
+    return { success: true };
+  } catch (error) {
+    console.error('Error writing file:', error);
+    return { success: false, error: error.message };
+  }
 })
 
 // Quit when all windows are closed, except on macOS. There, it's common

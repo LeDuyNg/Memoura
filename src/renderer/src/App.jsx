@@ -8,10 +8,16 @@ import Dashboard from './components/Dashboard';
 
 function App() {
   const [activeView, setActiveView] = useState('dashboard');
+  const [selectedFile, setSelectedFile] = useState(null);
   
   const [vaultData, setVaultData] = useState({ files: [], folders: [] });
   const [isLoading, setIsLoading] = useState(true); // Start as true
   const [error, setError] = useState(null);
+
+  const handleFileClick = (file) => {
+    setSelectedFile(file);
+    setActiveView('notepad');
+  };
   const [canvasCourses, setCanvasCourses] = useState([]);
 
   useEffect(() => {
@@ -85,16 +91,13 @@ function App() {
 
       <div className="main-content">
         {activeView === 'notepad' && <Notepad />}
-        {activeView === 'calendar' && (
-          <Calendar
-            courses={canvasCourses}
-            />
-          )}
+        {activeView === 'calendar' && <Calendar />}
         {activeView === 'dashboard' && (
           <Dashboard 
             vaultData={vaultData}
             isLoading={isLoading} 
-            error={error} 
+            error={error}
+            onFileClick={handleFileClick}
           />
         )}
       </div>

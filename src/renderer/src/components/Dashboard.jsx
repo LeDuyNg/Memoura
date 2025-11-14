@@ -4,7 +4,7 @@ import '../assets/Dashboard.css';
 // Group the folder and its files
 import { Fragment } from 'react'; 
 
-function Dashboard({ vaultData, isLoading, error }) {
+function Dashboard({ vaultData, isLoading, error, onFileClick }) {
   const [viewMode, setViewMode] = useState('list');
   
   // Add state to track the *filepath* of the expanded folder
@@ -115,7 +115,12 @@ function Dashboard({ vaultData, isLoading, error }) {
                     
                     {/* Get and render the files for *this* folder */}
                     {getFilesForFolder(folder.filepath).map(file => (
-                      <div key={file.filepath} className="file-item-indent">
+                      <div 
+                        key={file.filepath} 
+                        className="file-item-indent"
+                        onClick={() => onFileClick && onFileClick(file)}
+                        style={{ cursor: 'pointer' }}
+                      >
                         <span className="file-icon">{getFileIcon(file.filetype)}</span>
                         <span>{file.name}</span>
                       </div>
@@ -154,7 +159,12 @@ function Dashboard({ vaultData, isLoading, error }) {
             
             <div className="table-body">
               {vaultData.files.map(file => (
-                <div key={file.filepath} className="file-row">
+                <div 
+                  key={file.filepath} 
+                  className="file-row"
+                  onClick={() => onFileClick && onFileClick(file)}
+                  style={{ cursor: 'pointer' }}
+                >
                   <div className="col-name">
                     <span className="file-name">{file.name}</span>
                   </div>

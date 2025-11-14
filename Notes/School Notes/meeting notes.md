@@ -18,3 +18,4 @@
 - [ ] Sarah: Create project board in Asana.
 - [ ] Mike: Set up the initial database schema.
 - [ ] Duyen: Create wireframes for the dashboard.
+GAVIN IS THE EBST

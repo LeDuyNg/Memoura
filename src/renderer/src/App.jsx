@@ -90,14 +90,12 @@ function App() {
       />
 
       <div className="main-content">
-        {activeView === 'notepad' && <Notepad />}
+        {activeView === 'notepad' && <Notepad selectedFile={selectedFile} />}
         {activeView === 'calendar' && (
           <Calendar
             courses={canvasCourses}
-            />
-          )}
-        {activeView === 'notepad' && <Notepad selectedFile={selectedFile} />}
-        {activeView === 'calendar' && <Calendar />}
+          />
+        )}
         {activeView === 'dashboard' && (
           <Dashboard 
             vaultData={vaultData}

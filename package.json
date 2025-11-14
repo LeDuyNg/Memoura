@@ -20,7 +20,8 @@
   "dependencies": {
     "@electron-toolkit/preload": "^3.0.2",
     "@electron-toolkit/utils": "^4.0.0",
-    "dotenv": "^17.2.3"
+    "dotenv": "^17.2.3",
+    "marked": "^17.0.0"
   },
   "devDependencies": {
     "@electron-toolkit/eslint-config": "^2.1.0",

@@ -1,9 +1,11 @@
 import React, { useState, useEffect, useRef } from 'react';
+import { marked } from 'marked';
 
 function Notepad({ selectedFile }) {
   const [content, setContent] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [saveStatus, setSaveStatus] = useState('');
+  const [showPreview, setShowPreview] = useState(false);
   const saveTimeoutRef = useRef(null);
 
   useEffect(() => {
@@ -25,14 +27,14 @@ function Notepad({ selectedFile }) {
 
   const loadFileContent = async () => {
     if (!selectedFile || !selectedFile.filepath) return;
-    
+
     setIsLoading(true);
     setSaveStatus('Loading...');
     try {
       if (window.api && window.api.getVaultPath && window.api.readFile && window.api.joinPath) {
         const vaultPath = await window.api.getVaultPath();
         const fullPath = window.api.joinPath(vaultPath, selectedFile.filepath);
-        
+
         const result = await window.api.readFile(fullPath);
         if (result.success) {
           setContent(result.content);
@@ -57,13 +59,12 @@ function Notepad({ selectedFile }) {
 
   const saveFile = async (fileContent) => {
     if (!selectedFile || !selectedFile.filepath) return;
-    
+
     try {
       if (window.api && window.api.getVaultPath && window.api.writeFile && window.api.joinPath) {
-        // Get the vault path and combine with relative filepath
         const vaultPath = await window.api.getVaultPath();
         const fullPath = window.api.joinPath(vaultPath, selectedFile.filepath);
-        
+
         const result = await window.api.writeFile(fullPath, fileContent);
         if (result.success) {
           setSaveStatus('Saved');
@@ -85,7 +86,6 @@ function Notepad({ selectedFile }) {
     setContent(newContent);
     setSaveStatus('Saving...');
 
-    //Clear existing timeouT
     if (saveTimeoutRef.current) {
       clearTimeout(saveTimeoutRef.current);
     }
@@ -97,63 +97,111 @@ function Notepad({ selectedFile }) {
     }
   };
 
+  const isMarkdown = selectedFile?.name?.endsWith('.md');
+
   return (
-    <main style={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
+    <main className="notepad">
       {selectedFile && (
-        <div style={{ 
-          padding: '10px 15px', 
-          borderBottom: '1px solid var(--color-border)', 
-          backgroundColor: 'var(--color-background-secondary)',
-          display: 'flex',
-          justifyContent: 'space-between',
-          alignItems: 'center'
-        }}>
-          <div>
-            <h2 style={{ margin: 0, fontSize: '18px', color: 'var(--color-text-primary)' }}>{selectedFile.name}</h2>
-            <p style={{ margin: '5px 0 0 0', color: 'var(--color-text-secondary)', fontSize: '12px' }}>
-              {selectedFile.filepath || 'No path specified'}
-            </p>
+        <div className="notepad-header">
+
+
+
+
+
+
+
+
+
+
+          <div className="notepad-meta">
+            <h2>{selectedFile.name}</h2>
+            <p className="notepad-path">{selectedFile.filepath || 'No path specified'}</p>
           </div>
-          {saveStatus && (
-            <div style={{ 
-              padding: '5px 10px', 
-              borderRadius: '4px',
-              backgroundColor: saveStatus === 'Saved' ? 'rgba(76, 175, 80, 0.2)' : 
-                              saveStatus === 'Saving...' || saveStatus === 'Loading...' ? 'rgba(255, 193, 7, 0.2)' : 
-                              saveStatus.includes('Error') || saveStatus.includes('failed') ? 'rgba(244, 67, 54, 0.2)' : 'rgba(33, 150, 243, 0.2)',
-              color: saveStatus === 'Saved' ? '#81c784' : 
-                     saveStatus === 'Saving...' || saveStatus === 'Loading...' ? '#ffb74d' : 
-                     saveStatus.includes('Error') || saveStatus.includes('failed') ? '#e57373' : '#64b5f6',
-              fontSize: '12px',
-              fontWeight: '500',
-              border: '1px solid var(--color-border)'
-            }}>
-              {saveStatus}
-            </div>
-          )}
+
+          <div className="notepad-actions">
+            {isMarkdown && (
+              <button
+                className={`notepad-preview-toggle ${showPreview ? 'active' : ''}`}
+                onClick={() => setShowPreview(!showPreview)}
+                aria-label="Toggle preview"
+              >
+                {showPreview ? 'Edit' : 'Preview'}
+              </button>
+            )}
+            {saveStatus && (
+              <div
+                className="notepad-save-status"
+                style={{
+                  backgroundColor:
+                    saveStatus === 'Saved'
+                      ? 'rgba(76, 175, 80, 0.12)'
+                      : saveStatus === 'Saving...' || saveStatus === 'Loading...'
+                      ? 'rgba(255, 193, 7, 0.12)'
+                      : saveStatus.includes('Error') || saveStatus.includes('failed')
+                      ? 'rgba(244, 67, 54, 0.12)'
+                      : 'rgba(33, 150, 243, 0.12)',
+                  color:
+                    saveStatus === 'Saved'
+                      ? '#81c784'
+                      : saveStatus === 'Saving...' || saveStatus === 'Loading...'
+                      ? '#ffb74d'
+                      : saveStatus.includes('Error') || saveStatus.includes('failed')
+                      ? '#e57373'
+                      : '#64b5f6'
+                }}
+              >
+                {saveStatus}
+              </div>
+            )}
+          </div>
         </div>
       )}
-      <textarea 
-        placeholder={selectedFile ? "Start editing..." : "Select a file to edit"}
-        value={content}
-        onChange={handleContentChange}
-        disabled={isLoading || !selectedFile}
-        style={{ 
-          flex: 1,
-          width: '100%', 
-          border: 'none', 
-          padding: '15px', 
-          fontFamily: 'inherit',
-          fontSize: '14px',
-          lineHeight: '1.6',
-          resize: 'none',
-          outline: 'none',
-          backgroundColor: 'var(--color-background-primary)',
-          color: 'var(--color-text-primary)'
-        }}
-      ></textarea>
+
+      <div className="notepad-container">
+        <textarea
+          className="notepad-textarea"
+
+
+          placeholder={selectedFile ? 'Start editing...' : 'Select a file to edit'}
+          value={content}
+          onChange={handleContentChange}
+
+          disabled={isLoading || !selectedFile}
+          style={{
+            display: showPreview && isMarkdown ? 'none' : 'block'
+          }}
+        />
+        {isMarkdown && showPreview && (
+          <div
+            className="notepad-preview"
+            dangerouslySetInnerHTML={{ __html: marked(content) }}
+          />
+        )}
+      </div>
+
+
+
+
+
+
+
+
+
+
+
+
     </main>
+
+
+
   );
+
+
+
+
 }
+
+
+
 
 export default Notepad;

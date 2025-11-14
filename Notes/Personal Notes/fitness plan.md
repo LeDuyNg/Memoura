@@ -17,3 +17,5 @@
   - Overhead Press: 3x5
   - Lateral Raises: 3x12
   - Planks: 3 x 60s
+
+- **Gavins Day:** The Best Day

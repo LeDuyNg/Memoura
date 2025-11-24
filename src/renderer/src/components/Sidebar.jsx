@@ -81,36 +81,6 @@ function Sidebar({setActiveView}) {
           </ul>
         </li>
 
-        {/* --- Todo-Lists Sub-menu --- */}
-        <li>
-          <button
-            onClick={() => handleToggleSubMenu("todo")}
-            className={`dropdown-btn ${
-              openSubMenu === "todo" ? "rotate" : ""
-            }`}
-          >
-            <img src={TodoIcon} alt="Todo Lists" />
-            <span>Todo-Lists</span>
-            <img src={ArrowIcon} alt="Expand" />
-          </button>
-          <ul className={`sub-menu ${openSubMenu === "todo" ? "show" : ""}`}>
-            <div>
-              <li>
-                <a href="#">gavin</a>
-              </li>
-              <li>
-                <a href="#">is</a>
-              </li>
-              <li>
-                <a href="#">the</a>
-              </li>
-              <li>
-                <a href="#">best</a>
-              </li>
-            </div>
-          </ul>
-        </li>
-
         <li>
           <a href="#" id="Calendar Button" onClick={(e) => handleNavClick(e, 'calendar')}>
             <img src={CalendarIcon} alt="Calendar" />
@@ -119,7 +89,7 @@ function Sidebar({setActiveView}) {
         </li>
 
         <li>
-          <a href="#">
+          <a href="#" onClick={(e) => handleNavClick(e, 'ai')}>
             <img src={AiIcon} alt="AI" />
             <span>AI</span>
           </a>

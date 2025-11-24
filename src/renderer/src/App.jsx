@@ -5,6 +5,7 @@ import Notepad from "./components/Notepad";
 import Sidebar from "./components/Sidebar"; 
 import Calendar from './components/Calendar';
 import Dashboard from './components/Dashboard';
+import AIView from './components/AIView';
 
 function App() {
   const [activeView, setActiveView] = useState('dashboard');
@@ -102,6 +103,12 @@ function App() {
             isLoading={isLoading} 
             error={error}
             onFileClick={handleFileClick}
+          />
+        )}
+
+        {activeView === "ai" && (
+          <AIView 
+            vaultData={vaultData}
           />
         )}
       </div>

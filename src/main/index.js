@@ -9,7 +9,11 @@ import icon from "../../resources/icon.png?asset";
 import dotenv from 'dotenv'
 // Note: In development, app.getAppPath() points to your project root
 dotenv.config({ path: path.join(app.getAppPath(), '.env') })
+
+// --- IMPORT HANDLERS ---
+// UPDATED PATHS: Pointing to ../preload/ as requested
 import { registerCanvasHandler } from '../preload/CanvasAPI.js'
+import { registerAIHandler } from '../preload/aiHandler.js'
 
 function createWindow() {
   // Create the browser window.
@@ -63,7 +67,9 @@ app.whenReady().then(() => {
 
   createWindow();
 
+  // --- REGISTER HANDLERS ---
   registerCanvasHandler(ipcMain)
+  registerAIHandler(ipcMain)
 
   app.on("activate", function () {
     // On macOS it's common to re-create a window in the app when the
@@ -112,4 +118,3 @@ app.on("window-all-closed", () => {
     app.quit();
   }
 });
-

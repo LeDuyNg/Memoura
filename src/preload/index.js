@@ -12,6 +12,7 @@ const api = {
   writeFile: (filePath, content) => ipcRenderer.invoke('write-file', filePath, content),
   joinPath: (...paths) => path.join(...paths),
   fetchCanvasData: (endpoint) => ipcRenderer.invoke('fetch-canvas-data', endpoint),
+  renameFile: (oldPath, newPath) => ipcRenderer.invoke('rename-file', oldPath, newPath),
   generateFlashcards: (text, vaultPath) => ipcRenderer.invoke('generate-flashcards', { text, vaultPath })
 
 };

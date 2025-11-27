@@ -4,7 +4,7 @@ import '../assets/Dashboard.css';
 // Group the folder and its files
 import { Fragment } from 'react'; 
 
-function Dashboard({ vaultData, isLoading, error, onFileClick }) {
+function Dashboard({ vaultData, isLoading, error, onFileClick, onAddNote }) {
   const [viewMode, setViewMode] = useState('list');
   
   // Add state to track the *filepath* of the expanded folder
@@ -134,7 +134,15 @@ function Dashboard({ vaultData, isLoading, error, onFileClick }) {
         <div className="suggested-section">
           <div className="files-header">
             <h2>All files ({vaultData.files.length})</h2>
-            <div className="view-controls">
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <button
+                className="filter-btn folder-btn"
+                onClick={() => onAddNote && onAddNote()}
+                aria-label="Add Note"
+              >
+                + Add Note
+              </button>
+              <div className="view-controls">
               <button 
                 className={`view-btn ${viewMode === 'list' ? 'active' : ''}`}
                 onClick={() => setViewMode('list')}
@@ -147,6 +155,7 @@ function Dashboard({ vaultData, isLoading, error, onFileClick }) {
               >
                 ⊞
               </button>
+              </div>
             </div>
           </div>
 

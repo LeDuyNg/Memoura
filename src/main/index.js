@@ -110,6 +110,17 @@ ipcMain.handle('write-file', async (_, filePath, content) => {
   }
 })
 
+// Handler to rename/move a file
+ipcMain.handle('rename-file', async (_, oldPath, newPath) => {
+  try {
+    await fs.promises.rename(oldPath, newPath);
+    return { success: true };
+  } catch (error) {
+    console.error('Error renaming file:', error);
+    return { success: false, error: error.message };
+  }
+})
+
 // Quit when all windows are closed, except on macOS. There, it's common
 // for applications and their menu bar to stay active until the user quits
 // explicitly with Cmd + Q.

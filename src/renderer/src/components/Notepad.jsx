@@ -1,25 +1,17 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { marked } from 'marked';
- 
-function Notepad({ selectedFile, onRenameFile }) {
+import '../assets/Notepad.css';
+
+function Notepad({ selectedFile }) {
   const [content, setContent] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [saveStatus, setSaveStatus] = useState('');
   const [showPreview, setShowPreview] = useState(false);
-  const [titleInput, setTitleInput] = useState('');
   const saveTimeoutRef = useRef(null);
 
   useEffect(() => {
     if (selectedFile && selectedFile.filepath) {
       loadFileContent();
-      // initialize title input (base name without extension)
-      if (selectedFile.name) {
-        const idx = selectedFile.name.lastIndexOf('.')
-        const base = idx === -1 ? selectedFile.name : selectedFile.name.substring(0, idx)
-        setTitleInput(base)
-      } else {
-        setTitleInput('')
-      }
     } else {
       setContent('');
       setSaveStatus('');
@@ -112,63 +104,9 @@ function Notepad({ selectedFile, onRenameFile }) {
     <main className="notepad">
       {selectedFile && (
         <div className="notepad-header">
-
-
-
-
-
-
-
-
-
-
           <div className="notepad-meta">
-            {!showPreview ? (
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
-                <input
-                  className="notepad-title-input"
-                  value={titleInput}
-                  onChange={(e) => setTitleInput(e.target.value)}
-                  disabled={isLoading}
-                  onKeyDown={async (e) => {
-                    if (e.key === 'Enter') {
-                      e.preventDefault();
-                      if (onRenameFile && selectedFile && titleInput.trim()) {
-                        setSaveStatus('Renaming...');
-                        const res = await onRenameFile(selectedFile.filepath, titleInput.trim());
-                        if (res && res.success) {
-                          setSaveStatus('Renamed');
-                          setTimeout(() => setSaveStatus(''), 2000);
-                        } else {
-                          setSaveStatus(`Rename failed: ${res && res.error ? res.error : 'unknown'}`);
-                          setTimeout(() => setSaveStatus(''), 4000);
-                        }
-                      }
-                      e.currentTarget.blur();
-                    }
-                  }}
-                  onBlur={async () => {
-                    if (onRenameFile && selectedFile && titleInput.trim()) {
-                      setSaveStatus('Renaming...');
-                      const res = await onRenameFile(selectedFile.filepath, titleInput.trim());
-                      if (res && res.success) {
-                        setSaveStatus('Renamed');
-                        setTimeout(() => setSaveStatus(''), 2000);
-                      } else {
-                        setSaveStatus(`Rename failed: ${res && res.error ? res.error : 'unknown'}`);
-                        setTimeout(() => setSaveStatus(''), 4000);
-                      }
-                    }
-                  }}
-                />
-                <p className="notepad-path">{selectedFile.filepath || 'No path specified'}</p>
-              </div>
-            ) : (
-              <>
-                <h2>{selectedFile.name}</h2>
-                <p className="notepad-path">{selectedFile.filepath || 'No path specified'}</p>
-              </>
-            )}
+            <h1 className="notepad-title">{selectedFile.name}</h1>
+            <p className="notepad-path">{selectedFile.filepath || 'No path specified'}</p>
           </div>
 
           <div className="notepad-actions">
@@ -213,12 +151,9 @@ function Notepad({ selectedFile, onRenameFile }) {
       <div className="notepad-container">
         <textarea
           className="notepad-textarea"
-
-
           placeholder={selectedFile ? 'Start editing...' : 'Select a file to edit'}
           value={content}
           onChange={handleContentChange}
-
           disabled={isLoading || !selectedFile}
           style={{
             display: showPreview && isMarkdown ? 'none' : 'block'
@@ -231,30 +166,8 @@ function Notepad({ selectedFile, onRenameFile }) {
           />
         )}
       </div>
-
-
-
-
-
-
-
-
-
-
-
-
     </main>
-
-
-
   );
-
-
-
-
 }
-
-
-
 
 export default Notepad;

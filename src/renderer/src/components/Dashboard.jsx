@@ -1,7 +1,7 @@
 import React, { useState, Fragment } from 'react';
 import '../assets/Dashboard.css';
 
-function Dashboard({ vaultData, isLoading, error, onFileClick, onAddNote, onDeleteFile, onCreateFolder, onDeleteFolder, onCreateNote }) {
+function Dashboard({ vaultData, isLoading, error, onFileClick, onAddNote, onDeleteFile, onCreateFolder, onDeleteFolder, onCreateNote, onRenameItem }) {
   const [viewMode, setViewMode] = useState('list');
   const [expandedFolder, setExpandedFolder] = useState(null);
 
@@ -94,6 +94,19 @@ function Dashboard({ vaultData, isLoading, error, onFileClick, onAddNote, onDele
                     {/* Display actual folder name */}
                     <span style={{ fontWeight: '600', flex: 1 }}>{folder.name}</span>
                     
+                    {/* --- EDIT FOLDER BUTTON --- */}
+                    <button 
+                      className="edit-icon-btn"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        onRenameItem && onRenameItem(folder, 'folder');
+                      }}
+                      style={{color: '#d4d8dcff', opacity: 1}} 
+                      title="Rename Folder"
+                    >
+                      ✎
+                    </button>
+
                     {/* --- DELETE FOLDER BUTTON --- */}
                     <button 
                       className="delete-icon-btn"
@@ -101,6 +114,7 @@ function Dashboard({ vaultData, isLoading, error, onFileClick, onAddNote, onDele
                         e.stopPropagation(); 
                         onDeleteFolder && onDeleteFolder(folder);
                       }}
+                      style={{color: '#d4d8dcff', opacity: 1}} 
                       title="Delete Folder"
                     >
                       🗑️
@@ -133,16 +147,32 @@ function Dashboard({ vaultData, isLoading, error, onFileClick, onAddNote, onDele
                           <span>{file.name}</span>
                         </div>
                         
-                        <button 
-                          className="delete-folder-btn"
-                          onClick={(e) => {
-                            e.stopPropagation(); 
-                            onDeleteFile && onDeleteFile(file);
-                          }}
-                          title="Delete File"
-                        >
-                          Delete
-                        </button>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
+                          {/* --- EDIT FILE BUTTON (Dropdown) --- */}
+                          <button 
+                            className="edit-icon-btn"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              onRenameItem && onRenameItem(file, 'file');
+                            }}
+                            style={{color: '#d4d8dcff', opacity: 1}} 
+                            title="Rename File"
+                          >
+                            ✎
+                          </button>
+
+                          {/* --- DELETE FILE BUTTON (Dropdown) --- */}
+                          <button 
+                            className="delete-folder-btn"
+                            onClick={(e) => {
+                              e.stopPropagation(); 
+                              onDeleteFile && onDeleteFile(file);
+                            }}
+                            title="Delete File"
+                          >
+                            Delete
+                          </button>
+                        </div>
                       </div>
                     ))}
                   </div>
@@ -151,72 +181,6 @@ function Dashboard({ vaultData, isLoading, error, onFileClick, onAddNote, onDele
             ))}
           </div>
         </div>
-
-        {/* <div className="suggested-section">
-          <div className="files-header">
-            <h2>All files ({visibleFiles.length})</h2>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-              <button
-                className="filter-btn folder-btn"
-                onClick={() => onCreateNote && onCreateNote("")} // Create in root
-              >
-                + Add Note
-              </button>
-              <div className="view-controls">
-                <button 
-                  className={`view-btn ${viewMode === 'list' ? 'active' : ''}`}
-                  onClick={() => setViewMode('list')}
-                >
-                  ☰
-                </button>
-                <button 
-                  className={`view-btn ${viewMode === 'grid' ? 'active' : ''}`}
-                  onClick={() => setViewMode('grid')}
-                >
-                  ⊞
-                </button>
-              </div>
-            </div>
-          </div>
-
-          <div className="files-table">
-            <div className="table-header">
-              <div className="col-name">Name</div>
-              <div className="col-type">Type</div>
-              <div className="col-actions"></div>
-            </div>
-            
-            <div className="table-body">
-              {visibleFiles.map(file => (
-                <div 
-                  key={file.filepath} 
-                  className="file-row"
-                  onClick={() => onFileClick && onFileClick(file)}
-                  style={{ cursor: 'pointer' }}
-                >
-                  <div className="col-name">
-                    <span className="file-name">{file.name}</span>
-                  </div>
-                  <div className="col-type">
-                    <span className="file-type">{getFileIcon(file.filetype)}</span>
-                  </div>
-                  <div className="col-actions">
-                    <button 
-                      className="delete-btn"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        onDeleteFile && onDeleteFile(file);
-                      }}
-                      title="Delete File"
-                    >
-                      🗑️
-                    </button>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-        </div> */}
       </div>
     </div>
   );

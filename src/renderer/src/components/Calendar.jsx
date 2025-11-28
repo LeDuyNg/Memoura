@@ -448,7 +448,7 @@ function Calendar({ courses }) {
         </div>
       )}
 
-      {/* --- NEW: Delete Confirmation Modal --- */}
+      {/* --- Delete Confirmation Modal --- */}
       {showDeleteModal && (
         <div className="modal-overlay" onClick={cancelDeleteEvent}>
           <div className="modal-content" onClick={(e) => e.stopPropagation()} style={{maxWidth: '350px'}}>

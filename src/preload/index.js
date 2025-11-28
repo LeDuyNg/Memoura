@@ -17,6 +17,8 @@ const api = {
   deleteFile: (filePath) => ipcRenderer.invoke('delete-file', filePath),
   createFolder: (folderPath) => ipcRenderer.invoke('create-folder', folderPath),
   deleteFolder: (folderPath) => ipcRenderer.invoke('delete-folder', folderPath),
+  renameItem: (oldPath, newPath) => ipcRenderer.invoke('rename-item', { oldPath, newPath }),
+
 
   // --- DB APIs ---
   getEvents: () => ipcRenderer.invoke('db-get-events'),

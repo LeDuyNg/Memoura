@@ -1,0 +1,22 @@
+{
+  "title": "Generated Flashcards",
+  "created_at": "2025-11-28T05:05:47.905Z",
+  "flashcards": [
+    {
+      "question": "What is the primary goal of the Q4 Team Goals?",
+      "answer": "Launch the \"Shared Folders\" feature."
+    },
+    {
+      "question": "What is the engineering goal?",
+      "answer": "Reduce P95 API response time to < 200ms."
+    },
+    {
+      "question": "What is the engineering goal?",
+      "answer": "Achieve 90% unit test coverage for the main API."
+    },
+    {
+      "question": "What is the support goal?",
+      "answer": "Decrease first-response time to < 1 hour."
+    }
+  ]
+}

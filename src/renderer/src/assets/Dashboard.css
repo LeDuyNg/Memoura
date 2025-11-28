@@ -1,3 +1,4 @@
+/* --- Base Dashboard Styles --- */
 .dashboard {
   padding: 20px;
   background-color: var(--color-background-primary);
@@ -77,14 +78,14 @@
   margin-left: 20px; border-left: 2px solid #3a3a3c; padding-left: 10px; margin-top: 4px; margin-bottom: 12px;
 }
 
-/* --- IMPROVED: Styles for the + New File button inside folder --- */
+/* --- Styles for the + New File button inside folder --- */
 .folder-actions-row {
   margin-bottom: 8px;
-  padding-right: 12px; /* Add some spacing on the right */
+  padding-right: 12px;
 }
 
 .create-file-small-btn {
-  background-color: #3a3a3c; /* Darker background instead of transparent */
+  background-color: #3a3a3c;
   border: 1px solid transparent;
   color: #f2f2f7;
   font-size: 13px;
@@ -93,7 +94,7 @@
   border-radius: 6px;
   cursor: pointer;
   width: 100%;
-  text-align: center; /* Center the text */
+  text-align: center;
   transition: all 0.2s ease;
   display: flex;
   align-items: center;
@@ -102,9 +103,9 @@
 }
 
 .create-file-small-btn:hover {
-  background-color: #007aff; /* Blue background on hover */
+  background-color: #007aff;
   color: white;
-  transform: translateY(-1px); /* Subtle lift */
+  transform: translateY(-1px);
   box-shadow: 0 2px 5px rgba(0,0,0,0.2);
 }
 
@@ -120,6 +121,11 @@
 .file-item-indent .file-icon {
   font-size: 10px; font-weight: bold; background-color: #48484a; padding: 2px 6px;
   border-radius: 4px; margin-right: 10px; color: #e5e5ea; min-width: 30px; text-align: center;
+}
+
+.file-item-actions {
+  display: flex;
+  gap: 5px;
 }
 
 /* --- Files Table --- */
@@ -156,7 +162,20 @@
 .col-actions { display: flex; justify-content: flex-end; }
 .error-message { color: #ff453a; background-color: rgba(255, 69, 58, 0.1); padding: 15px; border-radius: 8px; }
 
-/* --- Delete Button Styles (Table View) --- */
+/* --- Action Icons --- */
+.delete-icon-btn, .edit-icon-btn {
+  background: transparent; border: none; cursor: pointer; font-size: 16px; padding: 4px 8px;
+  opacity: 0.0; transition: opacity 0.2s, transform 0.1s; margin-left: 5px;
+}
+.file-row:hover .delete-icon-btn, .file-row:hover .edit-icon-btn,
+.folder-item:hover .delete-icon-btn, .folder-item:hover .edit-icon-btn,
+.file-item-indent:hover .delete-icon-btn, .file-item-indent:hover .edit-icon-btn {
+  opacity: 0.6;
+}
+.delete-icon-btn:hover { opacity: 1 !important; transform: scale(1.1); color: #ff453a; }
+.edit-icon-btn:hover { opacity: 1 !important; transform: scale(1.1); color: #007aff; }
+
+/* Keep legacy class for now if needed */
 .delete-btn {
   background: transparent; border: none; cursor: pointer; font-size: 16px; padding: 4px 8px;
   opacity: 0.0; transition: opacity 0.2s, transform 0.1s;
@@ -164,15 +183,6 @@
 .file-row:hover .delete-btn { opacity: 0.6; }
 .delete-btn:hover { opacity: 1 !important; transform: scale(1.1); color: #ff453a; }
 
-/* --- Delete Icon (Trashcan) for Folder Item --- */
-.delete-icon-btn {
-  background: transparent; border: none; cursor: pointer; font-size: 16px; padding: 4px 8px;
-  opacity: 0.0; transition: opacity 0.2s, transform 0.1s; margin-left: 10px;
-}
-.folder-item:hover .delete-icon-btn { opacity: 0.6; }
-.delete-icon-btn:hover { opacity: 1 !important; transform: scale(1.1); color: #ff453a; }
-
-/* --- Delete Button Styles (Folder Dropdown) --- */
 .delete-folder-btn {
   background-color: rgba(255, 69, 58, 0.1); border: 1px solid #ff453a; color: #ff453a;
   border-radius: 4px; padding: 4px 10px; font-size: 11px; font-weight: 600;

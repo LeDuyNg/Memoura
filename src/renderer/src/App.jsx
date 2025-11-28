@@ -29,6 +29,11 @@ function App() {
   const [newFileName, setNewFileName] = useState("");
   const [newFileType, setNewFileType] = useState(".txt"); 
 
+  // --- RENAME MODAL STATE ---
+  const [showRenameModal, setShowRenameModal] = useState(false);
+  const [itemToRename, setItemToRename] = useState(null); // { type, data }
+  const [renameValue, setRenameValue] = useState("");
+
   // --- POMODORO STATE (Lifted Up) ---
   const [pomoMode, setPomoMode] = useState('focus'); // 'focus', 'short', 'long'
   const [pomoTimeLeft, setPomoTimeLeft] = useState(25 * 60);
@@ -159,6 +164,44 @@ function App() {
     }
   };
 
+  // --- Handle RENAME Requests ---
+  const handleRenameRequest = (item, type) => {
+    setItemToRename({ type, data: item });
+    setRenameValue(item.name); // Pre-fill with current name
+    setShowRenameModal(true);
+  };
+
+  const confirmRename = async () => {
+    if (!renameValue.trim() || !itemToRename) return;
+    
+    try {
+      const vaultPath = await window.api.getVaultPath();
+      const oldFullPath = await window.api.joinPath(vaultPath, itemToRename.data.filepath);
+      
+      // Construct new path by replacing the old name with the new one
+      // We need to preserve the parent directory
+      const parts = itemToRename.data.filepath.split(/[/\\]/);
+      parts.pop(); // Remove old name
+      const parentDir = parts.join('/'); 
+      
+      const newRelativePath = parentDir ? `${parentDir}/${renameValue}` : renameValue;
+      const newFullPath = await window.api.joinPath(vaultPath, newRelativePath);
+
+      const result = await window.api.renameItem(oldFullPath, newFullPath);
+
+      if (result.success) {
+        await loadVaultFiles().then(data => setVaultData(data));
+        setShowRenameModal(false);
+        setItemToRename(null);
+      } else {
+        alert("Failed to rename: " + result.error);
+      }
+    } catch (err) {
+      console.error("Error renaming item:", err);
+      alert("Error renaming item.");
+    }
+  };
+
   // --- Handle DELETE Requests ---
   const handleDeleteFile = (file) => {
     setItemToDelete({ type: 'file', data: file });
@@ -253,6 +296,7 @@ function App() {
             onCreateFolder={handleCreateFolder}
             onDeleteFolder={handleDeleteFolder}
             onCreateNote={handleCreateNotePrompt}
+            onRenameItem={handleRenameRequest}
           />
         )}
 
@@ -376,6 +420,33 @@ function App() {
               <div className="modal-footer">
                 <button className="btn-cancel" onClick={() => setShowCreateFileModal(false)}>Cancel</button>
                 <button className="btn-confirm-create" onClick={confirmCreateFile}>Create</button>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* --- RENAME MODAL --- */}
+        {showRenameModal && (
+          <div className="modal-overlay" onClick={() => setShowRenameModal(false)}>
+            <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+              <div className="modal-header">
+                <h2>Rename {itemToRename?.type === 'folder' ? 'Folder' : 'File'}</h2>
+                <button className="close-btn" onClick={() => setShowRenameModal(false)}>&times;</button>
+              </div>
+              <div className="modal-body">
+                <label style={{display: 'block', marginBottom: '8px', color: '#d1d1d6', fontSize: '14px'}}>New Name</label>
+                <input 
+                  type="text" 
+                  className="modal-input"
+                  value={renameValue}
+                  onChange={(e) => setRenameValue(e.target.value)}
+                  autoFocus
+                  onKeyDown={(e) => e.key === 'Enter' && confirmRename()}
+                />
+              </div>
+              <div className="modal-footer">
+                <button className="btn-cancel" onClick={() => setShowRenameModal(false)}>Cancel</button>
+                <button className="btn-confirm-create" onClick={confirmRename}>Rename</button>
               </div>
             </div>
           </div>

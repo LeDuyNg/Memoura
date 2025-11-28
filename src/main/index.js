@@ -120,6 +120,16 @@ ipcMain.handle('delete-folder', async (_, folderPath) => {
   }
 })
 
+ipcMain.handle('rename-item', async (_, { oldPath, newPath }) => {
+  try {
+    await fs.promises.rename(oldPath, newPath);
+    return { success: true };
+  } catch (error) {
+    console.error('Error renaming item:', error);
+    return { success: false, error: error.message };
+  }
+})
+
 app.on("window-all-closed", () => {
   if (process.platform !== "darwin") {
     app.quit();

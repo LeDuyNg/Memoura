@@ -1,0 +1,46 @@
+{
+  "title": "Generated Flashcards",
+  "created_at": "2025-11-28T05:05:37.854Z",
+  "flashcards": [
+    {
+      "question": "What is the date of the kickoff meeting?",
+      "answer": "2025-11-13"
+    },
+    {
+      "question": "Who are the attendees of the kickoff meeting?",
+      "answer": "Sarah, Mike, Duyen, Alex"
+    },
+    {
+      "question": "What is the agenda?",
+      "answer": "Project goals, Timeline, Roles and Responsibilities"
+    },
+    {
+      "question": "What is the key takeaway regarding the launch?",
+      "answer": "Launch beta by Jan 15th"
+    },
+    {
+      "question": "Which role is responsible for handling the backend API?",
+      "answer": "Mike"
+    },
+    {
+      "question": "Which roles are responsible for the React front-end?",
+      "answer": "Duyen and Alex"
+    },
+    {
+      "question": "Who is the project manager?",
+      "answer": "Sarah"
+    },
+    {
+      "question": "What action item is Sarah assigned?",
+      "answer": "Create project board in Asana"
+    },
+    {
+      "question": "What action item is Mike assigned?",
+      "answer": "Set up the initial database schema"
+    },
+    {
+      "question": "What action item is Duyen assigned?",
+      "answer": "Create wireframes for the dashboard"
+    }
+  ]
+}

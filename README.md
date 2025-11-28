@@ -26,7 +26,8 @@ Built with **Electron + React + Vite**
 To run Memoura locally, you WILL NEED:
 - [Node.js](https://nodejs.org/) (v16+) — comes with `npm`
 - [Git](https://git-scm.com/)
-- A Canvas API key 
+- [Ollama](https://ollama.com/) - required fore AI features
+- A **Canvas API Key** (if you want to sync your school assignments).
 
 **Supported Platforms:** macOS, Windows, Linux
 
@@ -46,25 +47,41 @@ npm install
 ```
 
 ### 3. Configure Environment (NECESSARY STEP DO NOT SKIP)
-Create a `.env` file in the project root to enable Canvas integration:
+Create a `.env` file in the project root to enable Canvas integration.
 
-In order to get your API key from canvas you need to go to your canvas settings by clicking on your "account" icon in the sidebar. Then select settings and scroll down until you see a blue button that says "New Access Token." Create one and you will be given an API key as a result.  
+**How to get your Canvas API Key:**
 
+1. Log in to your Canvas account.
+
+2. Click on your Account icon in the sidebar -> Settings.
+
+3. Scroll down to Approved Integrations and click the blue "+ New Access Token" button.
+
+4. Generate the token and copy it immediately.
+
+Create a file named .env in the root folder and paste your key:
 ```
 CANVAS_API_KEY="your_api_key_here"
 CANVAS_DOMAIN="https://sjsu.instructure.com"
 ```
+### 4. Setup AI (Ollama)
+Memoura uses a local LLM for privacy and speed
+1. Download and install [Ollama](https://ollama.com/download).
 
-### 4. Run Development Server
+2. Open your terminal and run the following command to download the `gemma3:1b model`:
+```bash
+ollama run gemma3:1b
+```
+(Ensure Ollama is running in the background while you use the app.)
+
+### 5. Run Development Server
 ```bash
 npm run dev
 ```
 The app will open in an Electron window. Changes to source files will hot-reload.
 
 ---
-
 ## Building
-
 This will be necessary if we ever acutally wish to ship this project out to other users:
 
 ```bash

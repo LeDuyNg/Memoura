@@ -1,0 +1,54 @@
+{
+  "title": "Generated Flashcards",
+  "created_at": "2025-11-28T00:32:59.196Z",
+  "flashcards": [
+    {
+      "question": "What muscle group is focused on Monday?",
+      "answer": "Chest & Triceps"
+    },
+    {
+      "question": "What exercises are performed on Monday?",
+      "answer": "Bench Press, Incline DB Press, Tricep Dips"
+    },
+    {
+      "question": "What is the rep range for the Pull-ups?",
+      "answer": "Max reps"
+    },
+    {
+      "question": "What is the rep range for the Barbell Row?",
+      "answer": "3x5"
+    },
+    {
+      "question": "What is the rep range for the Bicep Curls?",
+      "answer": "3x10"
+    },
+    {
+      "question": "What is the rep range for the Squats?",
+      "answer": "3x5"
+    },
+    {
+      "question": "What is the rep range for the Deadlift?",
+      "answer": "1x5"
+    },
+    {
+      "question": "What is the rep range for the Leg Press?",
+      "answer": "3x10"
+    },
+    {
+      "question": "What is the rep range for the Overhead Press?",
+      "answer": "3x5"
+    },
+    {
+      "question": "What is the rep range for the Lateral Raises?",
+      "answer": "3x12"
+    },
+    {
+      "question": "What is the rep range for the Planks?",
+      "answer": "60s"
+    },
+    {
+      "question": "What is the name of the workout day?",
+      "answer": "Gavins Day"
+    }
+  ]
+}

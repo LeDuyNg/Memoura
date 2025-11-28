@@ -1,15 +1,12 @@
 import { useState } from "react";
 
-// Import the icons you copied into src/assets
 import ToggleIcon from "../assets/arrow_left_double.svg";
 import DashboardIcon from "../assets/dashboard.svg";
-
-import CreateIcon from "../assets/create_folder.svg";
-import TodoIcon from "../assets/checklist.svg";
 import CalendarIcon from "../assets/calendar.svg";
 import AiIcon from "../assets/ai.svg";
+import FlashcardIcon from "../assets/flashcards.svg"; 
+import TimerIcon from "../assets/timer.svg";
 
-import ArrowIcon from "../assets/arrow_down.svg";
 
 function Sidebar({setActiveView}) {
   const [isClosed, setIsClosed] = useState(false);
@@ -53,34 +50,6 @@ function Sidebar({setActiveView}) {
           </a>
         </li>
 
-
-
-        {/* --- Create Sub-menu --- */}
-        <li>
-          <button
-            onClick={() => handleToggleSubMenu("create")}
-            className={`dropdown-btn ${
-              openSubMenu === "create" ? "rotate" : ""
-            }`}
-          >
-            <img src={CreateIcon} alt="Create" />
-            <span>Create</span>
-            <img src={ArrowIcon} alt="Expand" />
-          </button>
-          <ul
-            className={`sub-menu ${openSubMenu === "create" ? "show" : ""}`}
-          >
-            <div>
-              <li>
-                <a href="#">Folder</a>
-              </li>
-              <li>
-                <a href="#">Document</a>
-              </li>
-            </div>
-          </ul>
-        </li>
-
         <li>
           <a href="#" id="Calendar Button" onClick={(e) => handleNavClick(e, 'calendar')}>
             <img src={CalendarIcon} alt="Calendar" />
@@ -95,11 +64,23 @@ function Sidebar({setActiveView}) {
           </a>
         </li>
 
-        <li class="bottom-message">
-          <span>created by the 4 greatest minds the world has ever freaking seen</span>
+        <li>
+          <a href="#" onClick={(e) => handleNavClick(e, 'flashcards')}>
+            <img src={FlashcardIcon} alt="Flashcards" />
+            <span>Flashcards</span>
+          </a>
         </li>
 
+        <li>
+          <a href="#" onClick={(e) => handleNavClick(e, 'pomodoro')}>
+            <img src={TimerIcon} alt="Pomodoro" />
+            <span>Pomodoro</span>
+          </a>
+        </li>
 
+        {/* <li className="bottom-message">
+          <span>created by the 4 greatest minds the world has ever freaking seen</span>
+        </li> */}
       </ul>
     </nav>
   );

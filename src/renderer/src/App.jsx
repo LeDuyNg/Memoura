@@ -1,147 +1,91 @@
-// src/App.jsx
-
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import Notepad from "./components/Notepad";
 import Sidebar from "./components/Sidebar"; 
 import Calendar from './components/Calendar';
 import Dashboard from './components/Dashboard';
 import AIView from './components/AIView';
+import FlashcardView from './components/FlashcardView'; 
+import PomodoroView from './components/PomodoroView'; 
 
 function App() {
   const [activeView, setActiveView] = useState('dashboard');
   const [selectedFile, setSelectedFile] = useState(null);
   
   const [vaultData, setVaultData] = useState({ files: [], folders: [] });
-  const [isLoading, setIsLoading] = useState(true); // Start as true
+  const [isLoading, setIsLoading] = useState(true); 
   const [error, setError] = useState(null);
+
+  // --- DELETE MODAL STATE ---
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [itemToDelete, setItemToDelete] = useState(null);
+
+  // --- CREATE FOLDER MODAL STATE ---
+  const [showCreateFolderModal, setShowCreateFolderModal] = useState(false);
+  const [newFolderName, setNewFolderName] = useState("");
+
+  // --- CREATE FILE MODAL STATE ---
+  const [showCreateFileModal, setShowCreateFileModal] = useState(false);
+  const [createFileTargetFolder, setCreateFileTargetFolder] = useState("");
+  const [newFileName, setNewFileName] = useState("");
+  const [newFileType, setNewFileType] = useState(".txt"); 
+
+  // --- POMODORO STATE (Lifted Up) ---
+  const [pomoMode, setPomoMode] = useState('focus'); // 'focus', 'short', 'long'
+  const [pomoTimeLeft, setPomoTimeLeft] = useState(25 * 60);
+  const [pomoIsActive, setPomoIsActive] = useState(false);
+  const [pomoTask, setPomoTask] = useState('');
+
+  // --- POMODORO LOGIC ---
+  useEffect(() => {
+    let interval = null;
+
+    if (pomoIsActive && pomoTimeLeft > 0) {
+      interval = setInterval(() => {
+        setPomoTimeLeft((prevTime) => prevTime - 1);
+      }, 1000);
+    } else if (pomoTimeLeft === 0) {
+      setPomoIsActive(false);
+      clearInterval(interval);
+      if (Notification.permission === 'granted') {
+        new Notification("Timer Finished", { 
+          body: pomoMode === 'focus' ? "Time for a break!" : "Back to work!" 
+        });
+      }
+    }
+
+    return () => clearInterval(interval);
+  }, [pomoIsActive, pomoTimeLeft, pomoMode]);
+
+  const handlePomoSwitchMode = (newMode) => {
+    setPomoMode(newMode);
+    setPomoIsActive(false);
+    switch (newMode) {
+      case 'focus': setPomoTimeLeft(25 * 60); break;
+      case 'short': setPomoTimeLeft(5 * 60); break;
+      case 'long': setPomoTimeLeft(15 * 60); break;
+      default: setPomoTimeLeft(25 * 60);
+    }
+  };
+
+  const handlePomoToggle = () => {
+    setPomoIsActive(!pomoIsActive);
+  };
+
+  const handlePomoReset = () => {
+    setPomoIsActive(false);
+    switch (pomoMode) {
+      case 'focus': setPomoTimeLeft(25 * 60); break;
+      case 'short': setPomoTimeLeft(5 * 60); break;
+      case 'long': setPomoTimeLeft(15 * 60); break;
+      default: break;
+    }
+  };
 
   const handleFileClick = (file) => {
     setSelectedFile(file);
     setActiveView('notepad');
   };
-  
-  const handleAddNote = async () => {
-    try {
-      if (!window.api || !window.api.getVaultPath || !window.api.writeFile || !window.api.joinPath) {
-        console.error('File API not available');
-        return;
-      }
-
-      const vaultPath = await window.api.getVaultPath();
-      const filename = `new-note-${Date.now()}.md`;
-      const relPath = filename; // store at vault root
-      const fullPath = window.api.joinPath(vaultPath, relPath);
-      const content = `# ${filename.replace('.md','')}
-\nStart writing your note here...`;
-
-      const writeResult = await window.api.writeFile(fullPath, content);
-      if (writeResult && writeResult.success) {
-        // Refresh vault listing
-        try {
-          const data = await loadVaultFiles();
-          setVaultData(data);
-          // Attempt to find the new file in the refreshed data
-          const newFile = data.files.find(f => f.filepath === relPath || f.name === filename);
-          if (newFile) {
-            setSelectedFile(newFile);
-            setActiveView('notepad');
-          }
-        } catch (err) {
-          console.error('Error reloading vault after creating file:', err);
-        }
-      } else {
-        console.error('Failed to create note', writeResult && writeResult.error);
-      }
-    } catch (error) {
-      console.error('Error creating new note:', error);
-    }
-  };
-
-  const handleRenameFile = async (oldRelPath, newBaseName) => {
-    try {
-      if (!window.api || !window.api.getVaultPath || !window.api.renameFile || !window.api.joinPath) {
-        console.error('File API not available for rename');
-        return { success: false, error: 'API missing' };
-      }
-
-      const lastSlash = Math.max(oldRelPath.lastIndexOf('/'), oldRelPath.lastIndexOf('\\'));
-      const folder = lastSlash === -1 ? '' : oldRelPath.substring(0, lastSlash);
-      const oldName = lastSlash === -1 ? oldRelPath : oldRelPath.substring(lastSlash + 1);
-      const extIndex = oldName.lastIndexOf('.');
-      const ext = extIndex === -1 ? '' : oldName.substring(extIndex);
-
-      const newName = newBaseName.endsWith(ext) ? newBaseName : `${newBaseName}${ext}`;
-      const newRelPath = folder ? `${folder}/${newName}` : newName;
-
-      const vaultPath = await window.api.getVaultPath();
-      const fullOld = window.api.joinPath(vaultPath, oldRelPath);
-      const fullNew = window.api.joinPath(vaultPath, newRelPath);
-
-      const result = await window.api.renameFile(fullOld, fullNew);
-      if (result && result.success) {
-        // reload vault and select new file
-        try {
-          const data = await loadVaultFiles();
-          setVaultData(data);
-          const newFile = data.files.find(f => f.filepath === newRelPath || f.name === newName);
-          if (newFile) {
-            setSelectedFile(newFile);
-            setActiveView('notepad');
-          }
-        } catch (err) {
-          console.error('Error reloading vault after rename:', err);
-        }
-        return { success: true };
-      } else {
-        console.error('Rename failed', result && result.error);
-        return { success: false, error: result && result.error };
-      }
-    } catch (error) {
-      console.error('Error during rename:', error);
-      return { success: false, error: error.message };
-    }
-  };
   const [canvasCourses, setCanvasCourses] = useState([]);
-
-  useEffect(() => {
-    // Run both tasks in parallel
-    const loadAllData = async () => {
-      setIsLoading(true);
-      setError(null);
-      
-      // This runs both tasks at the same time and waits for both to finish
-      const results = await Promise.allSettled([
-        loadVaultFiles(),  // Task 1
-        loadCanvasData()   // Task 2
-      ]);
-
-      console.log('Data loading results:', results);
-
-      // --- Handle Vault File results ---
-      if (results[0].status === 'fulfilled') {
-        setVaultData(results[0].value);
-      } else {
-        // If it failed, log the error
-        console.error('Failed to load vault files:', results[0].reason);
-        setError('Failed to load vault files.');
-      }
-
-      // --- Handle Canvas Data results ---
-      if (results[1].status === 'fulfilled') {
-        const coursesData = results[1].value;
-        setCanvasCourses(coursesData);
-      } else {
-        // If it failed, log the error
-        console.error('Failed to load Canvas courses:', results[1].reason);
-        setError('Failed to load Canvas courses.');
-      }
-      
-      setIsLoading(false);
-    };
-
-    loadAllData();
-  }, []); // Runs once on mount
-
 
   // --- Helper function for loading vault ---
   const loadVaultFiles = async () => {
@@ -158,43 +102,283 @@ function App() {
     if (!window.api?.fetchCanvasData) {
       throw new Error("Canvas API is not available.");
     }
-    // Pass the base endpoint, the handler in main.js will add the params
     const courses = await window.api.fetchCanvasData('/api/v1/courses'); 
     if (courses.error) {
-      // Throw an error to be caught by allSettled
       throw new Error(courses.error);
     }
     return courses;
   };
+
+  // --- Handle CREATE Folder ---
+  const handleCreateFolder = () => {
+    setNewFolderName(""); 
+    setShowCreateFolderModal(true);
+  };
+
+  const confirmCreateFolder = async () => {
+    if (!newFolderName.trim()) return;
+    try {
+      const vaultPath = await window.api.getVaultPath();
+      const fullPath = await window.api.joinPath(vaultPath, newFolderName);
+      const result = await window.api.createFolder(fullPath);
+      if (result.success) {
+        await loadVaultFiles().then(data => setVaultData(data));
+        setShowCreateFolderModal(false);
+      } else {
+        alert("Failed to create folder: " + result.error);
+      }
+    } catch (err) {
+      console.error("Error creating folder:", err);
+    }
+  };
+
+  // --- Handle CREATE File ---
+  const handleCreateNotePrompt = (folderPath) => {
+    setCreateFileTargetFolder(folderPath);
+    setNewFileName("");
+    setNewFileType(".txt"); 
+    setShowCreateFileModal(true);
+  };
+
+  const confirmCreateFile = async () => {
+    if (!newFileName.trim()) return;
+    try {
+      const vaultPath = await window.api.getVaultPath();
+      const fileNameWithExt = `${newFileName}${newFileType}`;
+      const fullPath = await window.api.joinPath(vaultPath, createFileTargetFolder, fileNameWithExt);
+      const result = await window.api.writeFile(fullPath, "");
+      if (result.success) {
+        await loadVaultFiles().then(data => setVaultData(data));
+        setShowCreateFileModal(false);
+      } else {
+        alert("Failed to create file: " + result.error);
+      }
+    } catch (err) {
+      console.error("Error creating file:", err);
+      alert("Error creating file.");
+    }
+  };
+
+  // --- Handle DELETE Requests ---
+  const handleDeleteFile = (file) => {
+    setItemToDelete({ type: 'file', data: file });
+    setShowDeleteModal(true);
+  };
+
+  const handleDeleteFolder = (folder) => {
+    setItemToDelete({ type: 'folder', data: folder });
+    setShowDeleteModal(true);
+  };
+
+  const confirmDelete = async () => {
+    if (!itemToDelete) return;
+    try {
+      const vaultPath = await window.api.getVaultPath();
+      const fullPath = await window.api.joinPath(vaultPath, itemToDelete.data.filepath);
+      let result;
+      if (itemToDelete.type === 'file') {
+        result = await window.api.deleteFile(fullPath);
+      } else {
+        result = await window.api.deleteFolder(fullPath);
+      }
+      if (result.success) {
+        await loadVaultFiles().then(data => setVaultData(data));
+        setShowDeleteModal(false);
+        setItemToDelete(null);
+      } else {
+        alert(`Failed to delete ${itemToDelete.type}: ` + result.error);
+      }
+    } catch (err) {
+      console.error("Error deleting item:", err);
+      alert("Error deleting item.");
+    }
+  };
+
+  const cancelDelete = () => {
+    setShowDeleteModal(false);
+    setItemToDelete(null);
+  };
+
+  // --- Effects ---
+  useEffect(() => {
+    const loadAllData = async () => {
+      setIsLoading(true);
+      setError(null);
+      const results = await Promise.allSettled([
+        loadVaultFiles(),
+        loadCanvasData()
+      ]);
+      if (results[0].status === 'fulfilled') {
+        setVaultData(results[0].value);
+      } else {
+        console.error('Failed to load vault files:', results[0].reason);
+        setError('Failed to load vault files.');
+      }
+      if (results[1].status === 'fulfilled') {
+        setCanvasCourses(results[1].value);
+      } else {
+        console.error('Failed to load Canvas courses:', results[1].reason);
+        setError('Failed to load Canvas courses.');
+      }
+      setIsLoading(false);
+    };
+    loadAllData();
+  }, []); 
+
+  useEffect(() => {
+    if (activeView === 'dashboard' || activeView === 'flashcards') {
+      console.log(`${activeView} active: Re-scanning vault...`);
+      loadVaultFiles()
+        .then(data => setVaultData(data))
+        .catch(err => console.error("Re-scan failed:", err));
+    }
+  }, [activeView]);
+
   return (
     <div className="app">
-      <Sidebar 
-        setActiveView={setActiveView} 
-      />
+      <Sidebar setActiveView={setActiveView} />
 
       <div className="main-content">
-        {activeView === 'notepad' && (
-          <Notepad selectedFile={selectedFile} onRenameFile={handleRenameFile} />
-        )}
-        {activeView === 'calendar' && (
-          <Calendar
-            courses={canvasCourses}
-          />
-        )}
+        {activeView === 'notepad' && <Notepad selectedFile={selectedFile} />}
+        
+        {activeView === 'calendar' && <Calendar courses={canvasCourses} />}
+        
         {activeView === 'dashboard' && (
           <Dashboard 
             vaultData={vaultData}
             isLoading={isLoading} 
-            error={error}
+            error={error} 
             onFileClick={handleFileClick}
-            onAddNote={handleAddNote}
+            onDeleteFile={handleDeleteFile}
+            onCreateFolder={handleCreateFolder}
+            onDeleteFolder={handleDeleteFolder}
+            onCreateNote={handleCreateNotePrompt}
           />
         )}
 
-        {activeView === "ai" && (
-          <AIView 
-            vaultData={vaultData}
+        {activeView === "ai" && <AIView vaultData={vaultData} />}
+
+        {activeView === "flashcards" && <FlashcardView vaultData={vaultData} onDeleteFile={handleDeleteFile} />}
+
+        {/* --- PASSING PROPS TO POMODORO --- */}
+        {activeView === "pomodoro" && (
+          <PomodoroView 
+            mode={pomoMode}
+            timeLeft={pomoTimeLeft}
+            isActive={pomoIsActive}
+            task={pomoTask}
+            setTask={setPomoTask}
+            onSwitchMode={handlePomoSwitchMode}
+            onToggleTimer={handlePomoToggle}
+            onResetTimer={handlePomoReset}
           />
+        )}
+
+        {/* --- CUSTOM DELETE CONFIRMATION MODAL --- */}
+        {showDeleteModal && (
+          <div className="modal-overlay" onClick={cancelDelete}>
+            <div className="modal-content delete-modal" onClick={(e) => e.stopPropagation()}>
+              <div className="modal-header">
+                <h2>Delete {itemToDelete?.type === 'folder' ? 'Folder' : 'File'}</h2>
+                <button className="close-btn" onClick={cancelDelete}>&times;</button>
+              </div>
+              <div className="modal-body">
+                <p>Are you sure you want to delete <strong>"{itemToDelete?.data.name}"</strong>?</p>
+                {itemToDelete?.type === 'folder' && (
+                  <p className="warning-text">This will delete the folder AND all files inside it!</p>
+                )}
+                <p className="warning-text">This action cannot be undone.</p>
+              </div>
+              <div className="modal-footer">
+                <button className="btn-cancel" onClick={cancelDelete}>Cancel</button>
+                <button className="btn-confirm-delete" onClick={confirmDelete}>Delete</button>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* --- CUSTOM CREATE FOLDER MODAL --- */}
+        {showCreateFolderModal && (
+          <div className="modal-overlay" onClick={() => setShowCreateFolderModal(false)}>
+            <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+              <div className="modal-header">
+                <h2>Create New Folder</h2>
+                <button className="close-btn" onClick={() => setShowCreateFolderModal(false)}>&times;</button>
+              </div>
+              <div className="modal-body">
+                <label style={{display: 'block', marginBottom: '8px', color: '#d1d1d6', fontSize: '14px'}}>Folder Name</label>
+                <input 
+                  type="text" 
+                  className="modal-input"
+                  value={newFolderName}
+                  onChange={(e) => setNewFolderName(e.target.value)}
+                  placeholder="e.g., Project Beta"
+                  autoFocus
+                  onKeyDown={(e) => e.key === 'Enter' && confirmCreateFolder()}
+                />
+              </div>
+              <div className="modal-footer">
+                <button className="btn-cancel" onClick={() => setShowCreateFolderModal(false)}>Cancel</button>
+                <button className="btn-confirm-create" onClick={confirmCreateFolder}>Create</button>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* --- CUSTOM CREATE FILE MODAL --- */}
+        {showCreateFileModal && (
+          <div className="modal-overlay" onClick={() => setShowCreateFileModal(false)}>
+            <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+              <div className="modal-header">
+                <h2>Create New File</h2>
+                <button className="close-btn" onClick={() => setShowCreateFileModal(false)}>&times;</button>
+              </div>
+              <div className="modal-body">
+                <div style={{ marginBottom: '16px' }}>
+                  <label style={{display: 'block', marginBottom: '8px', color: '#d1d1d6', fontSize: '14px'}}>File Name</label>
+                  <input 
+                    type="text" 
+                    className="modal-input"
+                    value={newFileName}
+                    onChange={(e) => setNewFileName(e.target.value)}
+                    placeholder="e.g., Meeting Notes"
+                    autoFocus
+                    onKeyDown={(e) => e.key === 'Enter' && confirmCreateFile()}
+                  />
+                </div>
+                
+                <div>
+                  <label style={{display: 'block', marginBottom: '8px', color: '#d1d1d6', fontSize: '14px'}}>File Type</label>
+                  <div className="radio-group">
+                    <label className={`radio-label ${newFileType === '.txt' ? 'selected' : ''}`}>
+                      <input 
+                        type="radio" 
+                        name="fileType" 
+                        value=".txt" 
+                        checked={newFileType === '.txt'} 
+                        onChange={(e) => setNewFileType(e.target.value)}
+                      />
+                      Text (.txt)
+                    </label>
+                    <label className={`radio-label ${newFileType === '.md' ? 'selected' : ''}`}>
+                      <input 
+                        type="radio" 
+                        name="fileType" 
+                        value=".md" 
+                        checked={newFileType === '.md'} 
+                        onChange={(e) => setNewFileType(e.target.value)}
+                      />
+                      Markdown (.md)
+                    </label>
+                  </div>
+                </div>
+              </div>
+              <div className="modal-footer">
+                <button className="btn-cancel" onClick={() => setShowCreateFileModal(false)}>Cancel</button>
+                <button className="btn-confirm-create" onClick={confirmCreateFile}>Create</button>
+              </div>
+            </div>
+          </div>
         )}
       </div>
     </div>

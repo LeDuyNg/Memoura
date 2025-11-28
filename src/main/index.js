@@ -4,19 +4,15 @@ import path from 'path';
 import fs from 'fs';
 import { electronApp, optimizer, is } from "@electron-toolkit/utils";
 import icon from "../../resources/icon.png?asset";
+import dotenv from 'dotenv';
 
-// Load environment variables from .env file
-import dotenv from 'dotenv'
-// Note: In development, app.getAppPath() points to your project root
 dotenv.config({ path: path.join(app.getAppPath(), '.env') })
 
-// --- IMPORT HANDLERS ---
-// UPDATED PATHS: Pointing to ../preload/ as requested
-import { registerCanvasHandler } from '../preload/CanvasAPI.js'
+import { registerCanvasHandler } from '../preload/canvasHandler.js'
 import { registerAIHandler } from '../preload/aiHandler.js'
+import { registerDBHandlers } from '../preload/dbHandler.js'
 
 function createWindow() {
-  // Create the browser window.
   const mainWindow = new BrowserWindow({
     width: 1200,
     height: 900,
@@ -39,8 +35,6 @@ function createWindow() {
     return { action: "deny" };
   });
 
-  // HMR for renderer base on electron-vite cli.
-  // Load the remote URL for development or the local html file for production.
   if (is.dev && process.env["ELECTRON_RENDERER_URL"]) {
     mainWindow.loadURL(process.env["ELECTRON_RENDERER_URL"]);
   } else {
@@ -48,47 +42,34 @@ function createWindow() {
   }
 }
 
-// This method will be called when Electron has finished
-// initialization and is ready to create browser windows.
-// Some APIs can only be used after this event occurs.
 app.whenReady().then(() => {
-  // Set app user model id for windows
   electronApp.setAppUserModelId("com.electron");
 
-  // Default open or close DevTools by F12 in development
-  // and ignore CommandOrControl + R in production.
-  // see https://github.com/alex8088/electron-toolkit/tree/master/packages/utils
   app.on("browser-window-created", (_, window) => {
     optimizer.watchWindowShortcuts(window);
   });
 
-  // IPC test
   ipcMain.on("ping", () => console.log("pong"));
 
   createWindow();
 
   // --- REGISTER HANDLERS ---
-  registerCanvasHandler(ipcMain)
-  registerAIHandler(ipcMain)
+  registerCanvasHandler(ipcMain);
+  registerAIHandler(ipcMain);
+  registerDBHandlers(ipcMain); // <--- REGISTER HERE
 
   app.on("activate", function () {
-    // On macOS it's common to re-create a window in the app when the
-    // dock icon is clicked and there are no other windows open.
     if (BrowserWindow.getAllWindows().length === 0) createWindow();
   });
 });
 
-// This handler will find the 'Notes' folder relative to the project root
+// ... (Rest of your existing handlers for read/write/delete file/folder) ...
 ipcMain.handle('get-vault-path', () => {
   const rootPath = app.getAppPath()
-  
-  // We then join that with 'Notes'
   const vaultPath = path.join(rootPath, 'Notes')
-  
   return vaultPath
 })
 
-// Handler to read file contents
 ipcMain.handle('read-file', async (_, filePath) => {
   try {
     const content = await fs.promises.readFile(filePath, 'utf-8');
@@ -99,7 +80,6 @@ ipcMain.handle('read-file', async (_, filePath) => {
   }
 })
 
-// Handler to write file contents
 ipcMain.handle('write-file', async (_, filePath, content) => {
   try {
     await fs.promises.writeFile(filePath, content, 'utf-8');
@@ -110,20 +90,36 @@ ipcMain.handle('write-file', async (_, filePath, content) => {
   }
 })
 
-// Handler to rename/move a file
-ipcMain.handle('rename-file', async (_, oldPath, newPath) => {
+ipcMain.handle('delete-file', async (_, filePath) => {
   try {
-    await fs.promises.rename(oldPath, newPath);
+    await fs.promises.unlink(filePath);
     return { success: true };
   } catch (error) {
-    console.error('Error renaming file:', error);
+    console.error('Error deleting file:', error);
     return { success: false, error: error.message };
   }
 })
 
-// Quit when all windows are closed, except on macOS. There, it's common
-// for applications and their menu bar to stay active until the user quits
-// explicitly with Cmd + Q.
+ipcMain.handle('create-folder', async (_, folderPath) => {
+  try {
+    await fs.promises.mkdir(folderPath, { recursive: true });
+    return { success: true };
+  } catch (error) {
+    console.error('Error creating folder:', error);
+    return { success: false, error: error.message };
+  }
+})
+
+ipcMain.handle('delete-folder', async (_, folderPath) => {
+  try {
+    await fs.promises.rm(folderPath, { recursive: true, force: true });
+    return { success: true };
+  } catch (error) {
+    console.error('Error deleting folder:', error);
+    return { success: false, error: error.message };
+  }
+})
+
 app.on("window-all-closed", () => {
   if (process.platform !== "darwin") {
     app.quit();

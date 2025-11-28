@@ -12,16 +12,23 @@ const api = {
   writeFile: (filePath, content) => ipcRenderer.invoke('write-file', filePath, content),
   joinPath: (...paths) => path.join(...paths),
   fetchCanvasData: (endpoint) => ipcRenderer.invoke('fetch-canvas-data', endpoint),
-  renameFile: (oldPath, newPath) => ipcRenderer.invoke('rename-file', oldPath, newPath),
-  generateFlashcards: (text, vaultPath) => ipcRenderer.invoke('generate-flashcards', { text, vaultPath })
+  generateFlashcards: (text, vaultPath, originalFilePath) => ipcRenderer.invoke('generate-flashcards', { text, vaultPath, originalFilePath }),
+  summarizeText: (text, originalFilePath) => ipcRenderer.invoke('summarize-text', { text, originalFilePath }),
+  deleteFile: (filePath) => ipcRenderer.invoke('delete-file', filePath),
+  createFolder: (folderPath) => ipcRenderer.invoke('create-folder', folderPath),
+  deleteFolder: (folderPath) => ipcRenderer.invoke('delete-folder', folderPath),
 
+  // --- DB APIs ---
+  getEvents: () => ipcRenderer.invoke('db-get-events'),
+  addEvent: (eventData) => ipcRenderer.invoke('db-add-event', eventData),
+  updateEvent: (eventData) => ipcRenderer.invoke('db-update-event', eventData), // <--- ADDED
+  deleteEvent: (id) => ipcRenderer.invoke('db-delete-event', id),
 };
 
 
 if (process.contextIsolated) {
   try {
     contextBridge.exposeInMainWorld("electron", electronAPI);
-    
     contextBridge.exposeInMainWorld("api", api);
   } catch (error) {
     console.error(error);

@@ -1,64 +1,40 @@
-import React, { useState } from 'react';
+import React, { useState, Fragment } from 'react';
 import '../assets/Dashboard.css';
 
-// Group the folder and its files
-import { Fragment } from 'react'; 
-
-function Dashboard({ vaultData, isLoading, error, onFileClick, onAddNote }) {
+function Dashboard({ vaultData, isLoading, error, onFileClick, onAddNote, onDeleteFile, onCreateFolder, onDeleteFolder, onCreateNote }) {
   const [viewMode, setViewMode] = useState('list');
-  
-  // Add state to track the *filepath* of the expanded folder
   const [expandedFolder, setExpandedFolder] = useState(null);
 
   const getFileIcon = (type) => {
     const ext = type.startsWith('.') ? type.substring(1).toUpperCase() : type.toUpperCase();
     switch (ext) {
-      case 'MD':
-        return 'MD';
-      case 'TXT':
-        return 'TXT';
-      case 'PDF':
-        return 'PDF';
-      case 'DOC':
-      case 'DOCX':
-        return 'DOC';
-      case 'FOLDER':
-        return 'FOLDER';
-      default:
-        return ext; 
+      case 'MD': return 'MD';
+      case 'TXT': return 'TXT';
+      case 'PDF': return 'PDF';
+      case 'DOC': case 'DOCX': return 'DOC';
+      case 'FOLDER': return 'FOLDER';
+      default: return ext; 
     }
   };
 
-  // Click handler to set or clear the expanded folder
   const handleFolderClick = (folderFilepath) => {
-    // If we click the folder that's already open, close it (set to null)
     if (expandedFolder === folderFilepath) {
       setExpandedFolder(null);
     } else {
-      // Otherwise, open the clicked folder
       setExpandedFolder(folderFilepath);
     }
   };
 
-  // Helper function to get files for a specific folder path
   const getFilesForFolder = (folderFilepath) => {
     return vaultData.files.filter(file => {
-      // Get the parent directory of the file
       const lastSlashIndex = Math.max(file.filepath.lastIndexOf('/'), file.filepath.lastIndexOf('\\'));      
-      // If no '/', the parent is the root ("")
       const parentDir = lastSlashIndex === -1 ? "" : file.filepath.substring(0, lastSlashIndex);
-      
-      // Check if the file's parent directory matches the folder's path
       return parentDir === folderFilepath;
     });
   };
 
-  // Create a new list of folders
-  const allFoldersWithRoot = [
-    ...vaultData.folders // All the subfolders from the scanner
-  ];
+  const allFoldersWithRoot = [...vaultData.folders];
 
-  // (Loading and Error handling - keep this)
   if (isLoading) {
     return (
       <div className="dashboard">
@@ -86,26 +62,47 @@ function Dashboard({ vaultData, isLoading, error, onFileClick, onAddNote }) {
       <div className="dashboard-content">
 
         <div className="suggested-section">
-          <h2>All folders ({allFoldersWithRoot.length})</h2>
+          {/* --- HEADER WITH CREATE FOLDER BUTTON --- */}
+          <div className="section-header-row">
+            <h2>All folders ({allFoldersWithRoot.length})</h2>
+            <button 
+              className="create-folder-btn"
+              onClick={onCreateFolder}
+              title="Create New Folder"
+            >
+              <span className="plus-icon">+</span> 📁 New Folder
+            </button>
+          </div>
           
           <div className="folders-list"> 
-            
             {allFoldersWithRoot.map(folder => (
               <Fragment key={folder.filepath}>
-                
                 <div 
                   className="folder-item" 
                   onClick={() => handleFolderClick(folder.filepath)}
-                  style={{ cursor: 'pointer' }} // Show it's clickable
+                  style={{ cursor: 'pointer' }}
                 >
-                  <div className="folder-icon">
-                    {/* Show an icon if it's open or closed */}
-                    {expandedFolder === folder.filepath ? '▼' : '►'}
-                    {' '}
-                    {getFileIcon('folder')}
+                  <div className="folder-icon" style={{ display: 'flex', alignItems: 'center', width: '100%' }}>
+                    <span style={{ marginRight: '10px' }}>
+                      {expandedFolder === folder.filepath ? '▼' : '►'}
+                    </span>
+                    <span style={{ marginRight: '8px' }}>📁</span>
+                    <span style={{ fontWeight: '600', flex: 1 }}>{folder.name}</span>
+                    
+                    {/* --- DELETE FOLDER BUTTON --- */}
+                    <button 
+                      className="delete-icon-btn"
+                      onClick={(e) => {
+                        e.stopPropagation(); 
+                        onDeleteFolder && onDeleteFolder(folder);
+                      }}
+                      title="Delete Folder"
+                    >
+                      🗑️
+                    </button>
                   </div>
+                  
                   <div className="folder-info">
-                    <div className="folder-name">{folder.name}</div>
                     <div className="folder-location">{folder.filepath || './'}</div>
                   </div>
                 </div>
@@ -113,16 +110,38 @@ function Dashboard({ vaultData, isLoading, error, onFileClick, onAddNote }) {
                 {expandedFolder === folder.filepath && (
                   <div className="expanded-files-container">
                     
-                    {/* Get and render the files for *this* folder */}
+                    {/* --- NEW: CREATE FILE BUTTON INSIDE FOLDER --- */}
+                    <div className="folder-actions-row">
+                      <button 
+                        className="create-file-small-btn"
+                        onClick={() => onCreateNote && onCreateNote(folder.filepath)}
+                      >
+                        + New File
+                      </button>
+                    </div>
+
                     {getFilesForFolder(folder.filepath).map(file => (
                       <div 
                         key={file.filepath} 
                         className="file-item-indent"
                         onClick={() => onFileClick && onFileClick(file)}
-                        style={{ cursor: 'pointer' }}
+                        style={{ cursor: 'pointer', display: 'flex', justifyContent: 'space-between', paddingRight: '10px' }}
                       >
-                        <span className="file-icon">{getFileIcon(file.filetype)}</span>
-                        <span>{file.name}</span>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                          <span className="file-icon">{getFileIcon(file.filetype)}</span>
+                          <span>{file.name}</span>
+                        </div>
+                        
+                        <button 
+                          className="delete-folder-btn"
+                          onClick={(e) => {
+                            e.stopPropagation(); 
+                            onDeleteFile && onDeleteFile(file);
+                          }}
+                          title="Delete File"
+                        >
+                          Delete
+                        </button>
                       </div>
                     ))}
                   </div>
@@ -131,30 +150,30 @@ function Dashboard({ vaultData, isLoading, error, onFileClick, onAddNote }) {
             ))}
           </div>
         </div>
-        <div className="suggested-section">
+
+        {/* <div className="suggested-section">
           <div className="files-header">
             <h2>All files ({vaultData.files.length})</h2>
             <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
               <button
                 className="filter-btn folder-btn"
-                onClick={() => onAddNote && onAddNote()}
-                aria-label="Add Note"
+                onClick={() => onCreateNote && onCreateNote("")} // Create in root
               >
                 + Add Note
               </button>
               <div className="view-controls">
-              <button 
-                className={`view-btn ${viewMode === 'list' ? 'active' : ''}`}
-                onClick={() => setViewMode('list')}
-              >
-                ☰
-              </button>
-              <button 
-                className={`view-btn ${viewMode === 'grid' ? 'active' : ''}`}
-                onClick={() => setViewMode('grid')}
-              >
-                ⊞
-              </button>
+                <button 
+                  className={`view-btn ${viewMode === 'list' ? 'active' : ''}`}
+                  onClick={() => setViewMode('list')}
+                >
+                  ☰
+                </button>
+                <button 
+                  className={`view-btn ${viewMode === 'grid' ? 'active' : ''}`}
+                  onClick={() => setViewMode('grid')}
+                >
+                  ⊞
+                </button>
               </div>
             </div>
           </div>
@@ -181,13 +200,22 @@ function Dashboard({ vaultData, isLoading, error, onFileClick, onAddNote }) {
                     <span className="file-type">{getFileIcon(file.filetype)}</span>
                   </div>
                   <div className="col-actions">
+                    <button 
+                      className="delete-btn"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        onDeleteFile && onDeleteFile(file);
+                      }}
+                      title="Delete File"
+                    >
+                      🗑️
+                    </button>
                   </div>
                 </div>
               ))}
             </div>
           </div>
-
-        </div>
+        </div> */}
       </div>
     </div>
   );

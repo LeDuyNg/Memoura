@@ -1,13 +1,24 @@
-/* --- Main Container --- */
 .calendar-container {
-    flex:1;
-    width: 900px;
-    background-color: #1c1c1e; /* Dark background */
-  color: #f2f2f7; /* Light text */
+  flex: 1;
+  width: 100%; /* Changed from fixed 900px to responsive */
+  max-width: 1000px; /* Limit width for large screens */
+  background-color: #1c1c1e;
+  color: #f2f2f7;
   border-radius: 12px;
   padding: 20px;
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-  margin: 40px auto; /* Center the calendar on the page */
+  margin: 20px auto; /* Reduced margin slightly */
+  box-sizing: border-box; /* Ensure padding doesn't add to width */
+  
+  /* Hide Scrollbar */
+  -ms-overflow-style: none;  /* IE and Edge */
+  scrollbar-width: none;  /* Firefox */
+  overflow-y: auto; /* Allow vertical scrolling inside if needed */
+}
+
+/* Hide scrollbar for Chrome, Safari and Opera */
+.calendar-container::-webkit-scrollbar {
+  display: none;
 }
 
 /* --- Header --- */
@@ -39,10 +50,20 @@
   background-color: #58585a;
 }
 
+/* Add Event Button */
+.add-event-btn {
+  background-color: #007aff !important;
+  color: white !important;
+  font-weight: 500;
+}
+.add-event-btn:hover {
+  background-color: #005bb5 !important;
+}
+
 /* --- Grid Layout --- */
 .day-names, .calendar-grid {
   display: grid;
-  grid-template-columns: repeat(7, 1fr); /* 7 equal columns */
+  grid-template-columns: repeat(7, 1fr);
 }
 
 .day-names {
@@ -52,7 +73,7 @@
 .day-name {
   text-align: center;
   font-weight: 500;
-  color: #8e8e93; /* Muted color for day names */
+  color: #8e8e93;
   font-size: 14px;
 }
 
@@ -62,11 +83,17 @@
   padding: 8px;
   min-height: 110px;
   position: relative;
+  transition: background-color 0.2s;
+  cursor: pointer;
+}
+
+.calendar-day:hover {
+  background-color: #2c2c2e;
 }
 
 /* Add left border to all but the first cell in a row */
 .calendar-day:not(:nth-child(7n+1)) {
-    border-left: 1px solid #3a3a3c;
+  border-left: 1px solid #3a3a3c;
 }
 
 .day-number {
@@ -75,14 +102,12 @@
   display: inline-block;
 }
 
-/* Style for days not in the current month */
 .other-month .day-number {
   color: #555;
 }
 
-/* Red circle for the current day */
 .today {
-  background-color: #ff3b30; /* iOS-like red */
+  background-color: #ff3b30;
   color: white;
   width: 28px;
   height: 28px;
@@ -90,48 +115,49 @@
   display: flex;
   justify-content: center;
   align-items: center;
-  margin-left: -4px; /* Adjust position */
+  margin-left: -4px;
 }
-
 
 /* --- Events --- */
 .events {
   margin-top: 4px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
 }
 
 .event-pill {
-  font-size: 12px;
-  padding: 3px 6px;
+  font-size: 11px;
+  padding: 2px 6px;
   border-radius: 4px;
-  margin-bottom: 4px;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  color: white; /* Set text to white for all pills */
-  cursor: pointer; /* Show it's clickable */
+  color: white;
+  cursor: pointer;
   transition: filter 0.2s;
 }
 
 .event-pill:hover {
-  filter: brightness(1.2); /* Add a slight glow on hover */
+  filter: brightness(1.2);
 }
 
-/* Event color classes */
-.event-pill.purple { background-color: #af52de; }
-.event-pill.orange { background-color: #ff9500; }
-.event-pill.blue { background-color: #007aff; }
-.event-pill.more { background-color: transparent; color: #8e8e93;}
+/* Colors */
+.event-pill.purple, .dot.purple, .color-circle.purple { background-color: #af52de; }
+.event-pill.orange, .dot.orange, .color-circle.orange { background-color: #ff9500; }
+.event-pill.blue, .dot.blue, .color-circle.blue { background-color: #007aff; }
+.event-pill.green, .dot.green, .color-circle.green { background-color: #34c759; }
+.event-pill.red, .dot.red, .color-circle.red { background-color: #ff3b30; }
+.event-pill.teal, .dot.teal, .color-circle.teal { background-color: #5ac8fa; }
+.event-pill.pink, .dot.pink, .color-circle.pink { background-color: #ff2d55; }
+.event-pill.indigo, .dot.indigo, .color-circle.indigo { background-color: #5856d6; }
+.event-pill.yellow, .dot.yellow, .color-circle.yellow { background-color: #ffcc00; }
+.event-pill.brown, .dot.brown, .color-circle.brown { background-color: #a2845e; }
+.event-pill.gray, .dot.gray, .color-circle.gray { background-color: #8e8e93; }
+.event-pill.cyan, .dot.cyan, .color-circle.cyan { background-color: #32ade6; }
+.event-pill.mint, .dot.mint, .color-circle.mint { background-color: #00c7be; }
 
-/* Added colors */
-.event-pill.green { background-color: #34c759; }
-.event-pill.red { background-color: #ff3b30; }
-.event-pill.teal { background-color: #5ac8fa; }
-.event-pill.pink { background-color: #ff2d55; }
-.event-pill.indigo { background-color: #5856d6; }
-
-
-/* --- MODAL STYLES --- */
-
+/* --- Modal Styles --- */
 .modal-overlay {
   position: fixed;
   top: 0;
@@ -142,17 +168,21 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  z-index: 1000; /* Ensure it's on top */
+  z-index: 1000;
+  backdrop-filter: blur(2px);
 }
 
 .modal-content {
-  background: #2c2c2e; /* Slightly lighter dark shade */
+  background: #2c2c2e;
   padding: 24px;
   border-radius: 12px;
   width: 90%;
   max-width: 500px;
   color: #f2f2f7;
   box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+  display: flex;
+  flex-direction: column;
+  border: 1px solid #3a3a3c;
 }
 
 .modal-header {
@@ -164,11 +194,11 @@
   padding-bottom: 16px;
 }
 
-.modal-header h1 {
+.modal-header h1, .modal-header h2 {
   margin: 0;
-  font-size: 16px;
+  font-size: 18px;
   font-weight: 600;
-  color: #8e8e93; /* Muted color for course name */
+  color: #fff;
 }
 
 .modal-header button {
@@ -182,22 +212,68 @@
   line-height: 1;
 }
 
-.modal-body h2 {
-  margin-top: 0;
-  margin-bottom: 16px;
-  font-size: 22px;
-  font-weight: 600;
-  color: #ffffff;
-}
-
-.modal-body p {
-  font-size: 16px;
-  line-height: 1.5;
+.modal-body {
+  font-size: 15px;
   color: #e5e5ea;
-  margin: 10px 0;
 }
 
-.modal-body p strong {
-  color: #8e8e93; /* Muted color for labels */
-  margin-right: 8px;
+/* Form Fields */
+.event-form { display: flex; flex-direction: column; gap: 15px; }
+.form-group { display: flex; flex-direction: column; gap: 5px; }
+.form-group label { font-size: 12px; color: #8e8e93; font-weight: 500; }
+.modal-input { background: #1c1c1e; border: 1px solid #3a3a3c; border-radius: 6px; padding: 10px; color: white; font-size: 14px; outline: none; transition: border-color 0.2s; }
+.modal-input:focus { border-color: #007aff; }
+.form-row { display: flex; gap: 15px; }
+.form-row .form-group { flex: 1; }
+
+/* Color Picker */
+.color-options { display: flex; gap: 10px; flex-wrap: wrap; }
+.color-circle { width: 24px; height: 24px; border-radius: 50%; cursor: pointer; border: 2px solid transparent; transition: transform 0.2s; }
+.color-circle:hover { transform: scale(1.1); }
+.color-circle.selected { border-color: white; transform: scale(1.1); box-shadow: 0 0 0 2px white; }
+
+/* Buttons */
+.modal-footer { display: flex; justify-content: flex-end; gap: 10px; margin-top: 20px; }
+.btn-cancel { padding: 8px 16px; border-radius: 6px; border: 1px solid #3a3a3c; background: transparent; color: #f2f2f7; cursor: pointer; }
+.btn-confirm-create { padding: 8px 16px; border-radius: 6px; border: none; background: #007aff; color: white; cursor: pointer; font-weight: 600; }
+.btn-confirm-create:hover { background: #005bb5; }
+.mb-4 { margin-bottom: 16px; }
+
+/* Date List */
+.date-modal-list { 
+  list-style: none; 
+  padding: 0; 
+  margin: 0; 
+  max-height: 300px; 
+  overflow-y: auto; 
+  overflow-x: hidden; /* Hide horizontal scrollbar inside modal */
+}
+.date-modal-item { 
+  display: flex; 
+  align-items: flex-start; 
+  padding: 12px 0; 
+  border-bottom: 1px solid #3a3a3c; 
+  justify-content: space-between;
+  width: 100%; 
+  box-sizing: border-box;
+}
+.event-details { 
+  display: flex; 
+  flex-direction: column; 
+  flex: 1; 
+  min-width: 0; 
+  padding-right: 10px; 
+}
+.event-time { font-size: 11px; color: #8e8e93; }
+.event-title { font-size: 14px; font-weight: 600; color: #fff; margin: 2px 0; }
+.event-course { font-size: 12px; color: #007aff; }
+.delete-icon-btn { background: transparent; border: none; font-size: 16px; cursor: pointer; opacity: 0.6; transition: opacity 0.2s; }
+.delete-icon-btn:hover { opacity: 1; }
+.dot { width: 8px; height: 8px; border-radius: 50%; margin-top: 6px; margin-right: 12px; flex-shrink: 0; }
+
+.no-events-text {
+  text-align: center;
+  color: #8e8e93;
+  padding: 20px;
+  font-style: italic;
 }

@@ -1,0 +1,42 @@
+{
+  "title": "Generated Flashcards",
+  "created_at": "2025-11-28T00:35:30.204Z",
+  "flashcards": [
+    {
+      "question": "Why is Electron still a great choice in 2026?",
+      "answer": "For most apps, the benefits far outweigh the costs."
+    },
+    {
+      "question": "What is the main debate about native vs. web tech for desktop apps?",
+      "answer": "Native vs. Web tech for desktop apps."
+    },
+    {
+      "question": "What are some common complaints about Electron?",
+      "answer": "RAM, performance."
+    },
+    {
+      "question": "What is the author's argument regarding Electron?",
+      "answer": "For most apps, the benefits outweigh the costs."
+    },
+    {
+      "question": "What is Point 1 of the argument?",
+      "answer": "Speed of Development"
+    },
+    {
+      "question": "What is Point 2 of the argument?",
+      "answer": "The 'Performance' Argument"
+    },
+    {
+      "question": "What is the core argument of the 'Performance' point?",
+      "answer": "Computers are faster now, RAM is cheap, and 'slowness' is often bad code."
+    },
+    {
+      "question": "What is the conclusion of the author?",
+      "answer": "Don't discount Electron. It allows small teams and solo devs to build powerful, cross-platform apps."
+    },
+    {
+      "question": "What is the author's stance on Electron?",
+      "answer": "Allows small teams and solo devs to build powerful, cross-platform apps."
+    }
+  ]
+}

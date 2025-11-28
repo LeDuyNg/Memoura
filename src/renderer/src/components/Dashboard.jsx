@@ -33,7 +33,11 @@ function Dashboard({ vaultData, isLoading, error, onFileClick, onAddNote, onDele
     });
   };
 
-  const allFoldersWithRoot = [...vaultData.folders];
+  // --- MODIFIED: Filter out 'Flashcards' folder ---
+  const allFoldersWithRoot = vaultData.folders.filter(folder => folder.name !== 'Flashcards');
+
+  // --- NEW: Filter out files that are inside the Flashcards folder for the main list ---
+  const visibleFiles = vaultData.files.filter(file => !file.filepath.includes('Flashcards/'));
 
   if (isLoading) {
     return (
@@ -87,6 +91,7 @@ function Dashboard({ vaultData, isLoading, error, onFileClick, onAddNote, onDele
                       {expandedFolder === folder.filepath ? '▼' : '►'}
                     </span>
                     <span style={{ marginRight: '8px' }}>📁</span>
+                    {/* Display actual folder name */}
                     <span style={{ fontWeight: '600', flex: 1 }}>{folder.name}</span>
                     
                     {/* --- DELETE FOLDER BUTTON --- */}
@@ -101,16 +106,12 @@ function Dashboard({ vaultData, isLoading, error, onFileClick, onAddNote, onDele
                       🗑️
                     </button>
                   </div>
-                  
-                  <div className="folder-info">
-                    <div className="folder-location">{folder.filepath || './'}</div>
-                  </div>
                 </div>
 
                 {expandedFolder === folder.filepath && (
                   <div className="expanded-files-container">
                     
-                    {/* --- NEW: CREATE FILE BUTTON INSIDE FOLDER --- */}
+                    {/* --- CREATE FILE BUTTON INSIDE FOLDER --- */}
                     <div className="folder-actions-row">
                       <button 
                         className="create-file-small-btn"
@@ -153,7 +154,7 @@ function Dashboard({ vaultData, isLoading, error, onFileClick, onAddNote, onDele
 
         {/* <div className="suggested-section">
           <div className="files-header">
-            <h2>All files ({vaultData.files.length})</h2>
+            <h2>All files ({visibleFiles.length})</h2>
             <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
               <button
                 className="filter-btn folder-btn"
@@ -186,7 +187,7 @@ function Dashboard({ vaultData, isLoading, error, onFileClick, onAddNote, onDele
             </div>
             
             <div className="table-body">
-              {vaultData.files.map(file => (
+              {visibleFiles.map(file => (
                 <div 
                   key={file.filepath} 
                   className="file-row"

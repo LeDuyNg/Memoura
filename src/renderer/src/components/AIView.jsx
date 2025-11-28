@@ -27,7 +27,7 @@ function AIView({ vaultData }) {
 
     try {
       const vaultPath = await window.api.getVaultPath();
-      // --- UPDATED: Pass selectedFilePath to the backend ---
+      // Pass selectedFilePath to the backend
       const result = await window.api.generateFlashcards(inputText, vaultPath, selectedFilePath);
 
       if (result.error) {
@@ -159,49 +159,32 @@ function AIView({ vaultData }) {
               </div>
               
               <div className="file-list">
-                {/* Virtual Root Folder */}
-                <div className="folder-group">
-                  <div className="folder-select-item" onClick={() => toggleFolder("")}>
-                    <div className="folder-info-group">
-                      <span className="folder-icon">{expandedFolders[""] ? '📂' : '📁'}</span>
-                      <span className="folder-name">Vault Root</span>
-                    </div>
-                    <span className="folder-arrow">{expandedFolders[""] ? '▼' : '▶'}</span>
-                  </div>
-                  {expandedFolders[""] && (
-                    <div className="folder-files">
-                      {getFilesForFolder("").length > 0 ? getFilesForFolder("").map(file => (
-                        <div key={file.filepath} className="file-nested-item" onClick={() => handleFileSelect(file)}>
-                          <span className="file-icon">📄</span>
-                          <span className="file-name">{file.name}</span>
-                        </div>
-                      )) : <div className="no-files-in-folder">No text files</div>}
-                    </div>
-                  )}
-                </div>
+                {/* --- MODIFIED: Removed 'Vault Root' section completely --- */}
 
-                {/* Actual Folders */}
-                {vaultData && vaultData.folders.map(folder => (
-                  <div key={folder.filepath} className="folder-group">
-                    <div className="folder-select-item" onClick={() => toggleFolder(folder.filepath)}>
-                      <div className="folder-info-group">
-                        <span className="folder-icon">{expandedFolders[folder.filepath] ? '📂' : '📁'}</span>
-                        <span className="folder-name">{folder.name}</span>
+                {/* Actual Folders (Filtered) */}
+                {vaultData && vaultData.folders
+                  .filter(folder => folder.name !== 'Flashcards') // Filter out Flashcards folder
+                  .map(folder => (
+                    <div key={folder.filepath} className="folder-group">
+                      <div className="folder-select-item" onClick={() => toggleFolder(folder.filepath)}>
+                        <div className="folder-info-group">
+                          <span className="folder-icon">{expandedFolders[folder.filepath] ? '📂' : '📁'}</span>
+                          <span className="folder-name">{folder.name}</span>
+                        </div>
+                        <span className="folder-arrow">{expandedFolders[folder.filepath] ? '▼' : '▶'}</span>
                       </div>
-                      <span className="folder-arrow">{expandedFolders[folder.filepath] ? '▼' : '▶'}</span>
+                      
+                      {expandedFolders[folder.filepath] && (
+                        <div className="folder-files">
+                          {getFilesForFolder(folder.filepath).length > 0 ? getFilesForFolder(folder.filepath).map(file => (
+                            <div key={file.filepath} className="file-nested-item" onClick={() => handleFileSelect(file)}>
+                              <span className="file-icon">📄</span>
+                              <span className="file-name">{file.name}</span>
+                            </div>
+                          )) : <div className="no-files-in-folder">No text files</div>}
+                        </div>
+                      )}
                     </div>
-                    
-                    {expandedFolders[folder.filepath] && (
-                      <div className="folder-files">
-                        {getFilesForFolder(folder.filepath).length > 0 ? getFilesForFolder(folder.filepath).map(file => (
-                          <div key={file.filepath} className="file-nested-item" onClick={() => handleFileSelect(file)}>
-                            <span className="file-icon">📄</span>
-                            <span className="file-name">{file.name}</span>
-                          </div>
-                        )) : <div className="no-files-in-folder">No text files</div>}
-                      </div>
-                    )}
-                  </div>
                 ))}
               </div>
             </div>

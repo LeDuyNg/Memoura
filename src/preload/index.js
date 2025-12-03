@@ -19,12 +19,14 @@ const api = {
   deleteFolder: (folderPath) => ipcRenderer.invoke('delete-folder', folderPath),
   renameItem: (oldPath, newPath) => ipcRenderer.invoke('rename-item', { oldPath, newPath }),
 
-
   // --- DB APIs ---
   getEvents: () => ipcRenderer.invoke('db-get-events'),
   addEvent: (eventData) => ipcRenderer.invoke('db-add-event', eventData),
-  updateEvent: (eventData) => ipcRenderer.invoke('db-update-event', eventData), // <--- ADDED
+  updateEvent: (eventData) => ipcRenderer.invoke('db-update-event', eventData), 
   deleteEvent: (id) => ipcRenderer.invoke('db-delete-event', id),
+  
+  // --- Export PDF API ---
+  exportToPdf: (htmlContent, defaultFileName) => ipcRenderer.invoke('export-to-pdf', { htmlContent, defaultFileName }),
 };
 
 

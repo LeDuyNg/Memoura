@@ -1,4 +1,3 @@
-/* --- Base Dashboard Styles --- */
 .dashboard {
   padding: 20px;
   background-color: var(--color-background-primary);
@@ -23,7 +22,7 @@
   margin-bottom: 20px;
 }
 
-/* --- Search & Filter --- */
+/* ... Search/Filter styles ... */
 .search-bar { margin-bottom: 30px; }
 .search-bar input {
   width: 100%; max-width: 600px; padding: 12px 16px;
@@ -46,12 +45,12 @@
 
 .dashboard-content { width: 100%; max-width: none; display: flex; flex-direction: column; }
 
-/* --- Section Headers --- */
+/* ... Section Headers ... */
 .suggested-section { margin-bottom: 50px; }
 .section-header-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
 .section-header-row h2, .suggested-section h2 { font-size: 1.5rem; font-weight: 400; color: var(--color-text-primary); margin: 0; }
 
-/* --- Create Folder Button --- */
+/* ... Create Folder Button ... */
 .create-folder-btn {
   background-color: transparent; border: 1px solid #3a3a3c; color: #007aff;
   padding: 6px 12px; border-radius: 6px; cursor: pointer; font-weight: 500;
@@ -60,7 +59,7 @@
 .create-folder-btn:hover { background-color: rgba(0, 122, 255, 0.1); border-color: #007aff; }
 .plus-icon { font-size: 16px; line-height: 1; }
 
-/* --- Folder List Styles --- */
+/* ... Folder List Styles ... */
 .folders-list { display: flex; flex-direction: column; gap: 8px; }
 .folder-item {
   display: flex; align-items: center; padding: 12px;
@@ -73,17 +72,16 @@
 .folder-name { font-weight: 500; color: var(--color-text-primary); font-size: 15px; }
 .folder-location { font-size: 12px; color: var(--color-text-secondary); }
 
-/* --- Expanded File List --- */
+/* ... Expanded File List ... */
 .expanded-files-container {
   margin-left: 20px; border-left: 2px solid #3a3a3c; padding-left: 10px; margin-top: 4px; margin-bottom: 12px;
 }
 
-/* --- Styles for the + New File button inside folder --- */
+/* New File Button inside Folder */
 .folder-actions-row {
   margin-bottom: 8px;
   padding-right: 12px;
 }
-
 .create-file-small-btn {
   background-color: #3a3a3c;
   border: 1px solid transparent;
@@ -101,17 +99,13 @@
   justify-content: center;
   gap: 6px;
 }
-
 .create-file-small-btn:hover {
   background-color: #007aff;
   color: white;
   transform: translateY(-1px);
   box-shadow: 0 2px 5px rgba(0,0,0,0.2);
 }
-
-.create-file-small-btn:active {
-  transform: translateY(0);
-}
+.create-file-small-btn:active { transform: translateY(0); }
 
 .file-item-indent {
   display: flex; align-items: center; justify-content: space-between; padding: 8px 12px;
@@ -122,13 +116,9 @@
   font-size: 10px; font-weight: bold; background-color: #48484a; padding: 2px 6px;
   border-radius: 4px; margin-right: 10px; color: #e5e5ea; min-width: 30px; text-align: center;
 }
+.file-item-actions { display: flex; gap: 5px; }
 
-.file-item-actions {
-  display: flex;
-  gap: 5px;
-}
-
-/* --- Files Table --- */
+/* ... Files Table ... */
 .files-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
 .view-controls { display: flex; gap: 4px; }
 .view-btn {
@@ -163,17 +153,18 @@
 .error-message { color: #ff453a; background-color: rgba(255, 69, 58, 0.1); padding: 15px; border-radius: 8px; }
 
 /* --- Action Icons --- */
-.delete-icon-btn, .edit-icon-btn {
+.delete-icon-btn, .edit-icon-btn, .export-icon-btn {
   background: transparent; border: none; cursor: pointer; font-size: 16px; padding: 4px 8px;
   opacity: 0.0; transition: opacity 0.2s, transform 0.1s; margin-left: 5px;
 }
-.file-row:hover .delete-icon-btn, .file-row:hover .edit-icon-btn,
-.folder-item:hover .delete-icon-btn, .folder-item:hover .edit-icon-btn,
-.file-item-indent:hover .delete-icon-btn, .file-item-indent:hover .edit-icon-btn {
+.file-row:hover .delete-icon-btn, .file-row:hover .edit-icon-btn, .file-row:hover .export-icon-btn,
+.folder-item:hover .delete-icon-btn, .folder-item:hover .edit-icon-btn, .folder-item:hover .export-icon-btn,
+.file-item-indent:hover .delete-icon-btn, .file-item-indent:hover .edit-icon-btn, .file-item-indent:hover .export-icon-btn {
   opacity: 0.6;
 }
 .delete-icon-btn:hover { opacity: 1 !important; transform: scale(1.1); color: #ff453a; }
 .edit-icon-btn:hover { opacity: 1 !important; transform: scale(1.1); color: #007aff; }
+.export-icon-btn:hover { opacity: 1 !important; transform: scale(1.1); color: #34c759; }
 
 /* Keep legacy class for now if needed */
 .delete-btn {
@@ -244,3 +235,22 @@
   background: rgba(0, 122, 255, 0.15); border-color: #007aff; color: #fff;
 }
 .radio-label input { margin: 0; }
+
+/* --- ADDED: Success Modal Styles --- */
+.success-modal {
+  border-color: #34c759;
+  box-shadow: 0 20px 40px rgba(0, 255, 100, 0.1);
+}
+.success-text {
+  color: #34c759;
+  font-size: 14px;
+  margin-top: 8px;
+  font-weight: 500;
+}
+.btn-confirm-success {
+  padding: 10px 18px; border-radius: 8px; border: none;
+  background: #34c759; color: white; cursor: pointer; font-weight: 600; transition: background 0.2s;
+}
+.btn-confirm-success:hover {
+  background: #28a745;
+}

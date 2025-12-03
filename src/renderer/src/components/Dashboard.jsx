@@ -1,7 +1,7 @@
 import React, { useState, Fragment } from 'react';
 import '../assets/Dashboard.css';
 
-function Dashboard({ vaultData, isLoading, error, onFileClick, onAddNote, onDeleteFile, onCreateFolder, onDeleteFolder, onCreateNote, onRenameItem }) {
+function Dashboard({ vaultData, isLoading, error, onFileClick, onAddNote, onDeleteFile, onCreateFolder, onDeleteFolder, onCreateNote, onRenameItem, onExportFile }) {
   const [viewMode, setViewMode] = useState('list');
   const [expandedFolder, setExpandedFolder] = useState(null);
 
@@ -33,10 +33,7 @@ function Dashboard({ vaultData, isLoading, error, onFileClick, onAddNote, onDele
     });
   };
 
-  // --- MODIFIED: Filter out 'Flashcards' folder ---
   const allFoldersWithRoot = vaultData.folders.filter(folder => folder.name !== 'Flashcards');
-
-  // --- NEW: Filter out files that are inside the Flashcards folder for the main list ---
   const visibleFiles = vaultData.files.filter(file => !file.filepath.includes('Flashcards/'));
 
   if (isLoading) {
@@ -66,7 +63,6 @@ function Dashboard({ vaultData, isLoading, error, onFileClick, onAddNote, onDele
       <div className="dashboard-content">
 
         <div className="suggested-section">
-          {/* --- HEADER WITH CREATE FOLDER BUTTON --- */}
           <div className="section-header-row">
             <h2>All folders ({allFoldersWithRoot.length})</h2>
             <button 
@@ -91,30 +87,26 @@ function Dashboard({ vaultData, isLoading, error, onFileClick, onAddNote, onDele
                       {expandedFolder === folder.filepath ? '▼' : '►'}
                     </span>
                     <span style={{ marginRight: '8px' }}>📁</span>
-                    {/* Display actual folder name */}
                     <span style={{ fontWeight: '600', flex: 1 }}>{folder.name}</span>
                     
-                    {/* --- EDIT FOLDER BUTTON --- */}
                     <button 
                       className="edit-icon-btn"
+                      style={{color: '#d4d8dcff', opacity: 1}}
                       onClick={(e) => {
                         e.stopPropagation();
                         onRenameItem && onRenameItem(folder, 'folder');
                       }}
-                      style={{color: '#d4d8dcff', opacity: 1}} 
                       title="Rename Folder"
                     >
                       ✎
                     </button>
-
-                    {/* --- DELETE FOLDER BUTTON --- */}
                     <button 
                       className="delete-icon-btn"
+                      style={{color: '#d4d8dcff', opacity: 1}}
                       onClick={(e) => {
                         e.stopPropagation(); 
                         onDeleteFolder && onDeleteFolder(folder);
                       }}
-                      style={{color: '#d4d8dcff', opacity: 1}} 
                       title="Delete Folder"
                     >
                       🗑️
@@ -125,7 +117,6 @@ function Dashboard({ vaultData, isLoading, error, onFileClick, onAddNote, onDele
                 {expandedFolder === folder.filepath && (
                   <div className="expanded-files-container">
                     
-                    {/* --- CREATE FILE BUTTON INSIDE FOLDER --- */}
                     <div className="folder-actions-row">
                       <button 
                         className="create-file-small-btn"
@@ -147,30 +138,40 @@ function Dashboard({ vaultData, isLoading, error, onFileClick, onAddNote, onDele
                           <span>{file.name}</span>
                         </div>
                         
-                        <div style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
-                          {/* --- EDIT FILE BUTTON (Dropdown) --- */}
+                        <div className="file-item-actions">
+                           {/* --- ADDED: Export PDF Button (Dropdown) --- */}
+                          <button 
+                            className="export-icon-btn"
+                            style={{color: '#d4d8dcff', opacity: 1}}
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              onExportFile && onExportFile(file);
+                            }}
+                            title="Export to PDF"
+                          >
+                            ⇪
+                          </button>
                           <button 
                             className="edit-icon-btn"
+                            style={{color: '#d4d8dcff', opacity: 1}}
                             onClick={(e) => {
                               e.stopPropagation();
                               onRenameItem && onRenameItem(file, 'file');
                             }}
-                            style={{color: '#d4d8dcff', opacity: 1}} 
                             title="Rename File"
                           >
                             ✎
                           </button>
-
-                          {/* --- DELETE FILE BUTTON (Dropdown) --- */}
                           <button 
-                            className="delete-folder-btn"
+                            className="delete-icon-btn"
+                            style={{color: '#d4d8dcff', opacity: 1}}
                             onClick={(e) => {
                               e.stopPropagation(); 
                               onDeleteFile && onDeleteFile(file);
                             }}
                             title="Delete File"
                           >
-                            Delete
+                            🗑️
                           </button>
                         </div>
                       </div>

@@ -1,4 +1,4 @@
-import { app, shell, BrowserWindow, ipcMain } from "electron";
+import { app, shell, BrowserWindow, ipcMain, dialog } from "electron";
 import { join } from "path";
 import path from 'path';
 import fs from 'fs';
@@ -56,14 +56,15 @@ app.whenReady().then(() => {
   // --- REGISTER HANDLERS ---
   registerCanvasHandler(ipcMain);
   registerAIHandler(ipcMain);
-  registerDBHandlers(ipcMain); // <--- REGISTER HERE
+  registerDBHandlers(ipcMain); 
 
   app.on("activate", function () {
     if (BrowserWindow.getAllWindows().length === 0) createWindow();
   });
 });
 
-// ... (Rest of your existing handlers for read/write/delete file/folder) ...
+// --- File System Handlers ---
+
 ipcMain.handle('get-vault-path', () => {
   const rootPath = app.getAppPath()
   const vaultPath = path.join(rootPath, 'Notes')
@@ -126,6 +127,47 @@ ipcMain.handle('rename-item', async (_, { oldPath, newPath }) => {
     return { success: true };
   } catch (error) {
     console.error('Error renaming item:', error);
+    return { success: false, error: error.message };
+  }
+})
+
+// --- NEW: Export to PDF Handler ---
+ipcMain.handle('export-to-pdf', async (_, { htmlContent, defaultFileName }) => {
+  try {
+    // 1. Open the Save Dialog
+    const { filePath } = await dialog.showSaveDialog({
+      title: 'Export to PDF',
+      defaultPath: defaultFileName,
+      filters: [{ name: 'PDF Files', extensions: ['pdf'] }]
+    });
+
+    if (!filePath) return { success: false, canceled: true };
+
+    // 2. Create a hidden window to render the HTML
+    const pdfWindow = new BrowserWindow({ 
+      show: false, 
+      webPreferences: { nodeIntegration: true } 
+    });
+
+    // 3. Load the HTML content
+    await pdfWindow.loadURL(`data:text/html;charset=utf-8,${encodeURIComponent(htmlContent)}`);
+
+    // 4. Print to PDF
+    const pdfData = await pdfWindow.webContents.printToPDF({
+      printBackground: true,
+      pageSize: 'A4',
+    });
+
+    // 5. Save the file
+    await fs.promises.writeFile(filePath, pdfData);
+    
+    // 6. Cleanup
+    pdfWindow.close();
+
+    return { success: true, filePath };
+
+  } catch (error) {
+    console.error('Error exporting PDF:', error);
     return { success: false, error: error.message };
   }
 })

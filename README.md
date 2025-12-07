@@ -8,6 +8,8 @@ A student-first note-taking and productivity app. Organize your notes, sync with
 
 Built with **Electron + React + Vite**
 
+Link to video demo: https://drive.google.com/drive/folders/1s-gDN345HBq7WEGDQlwXGmNFc-gSz8wB?usp=share_link
+
 ---
 
 ## Features
